@@ -82,9 +82,6 @@ export default function LoginPage() {
             >
               {loading ? 'Entrando...' : 'Entrar'}
             </Button>
-            <p className="text-xs text-zinc-500 text-center mt-4">
-              Credenciais padrão: admin / admin123
-            </p>
           </form>
         </CardContent>
       </Card>
