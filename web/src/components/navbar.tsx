@@ -53,7 +53,7 @@ export function Navbar({ userRole }: NavbarProps) {
   }
 
   return (
-    <header className="border-b border-zinc-800 bg-zinc-900/60 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-zinc-800 bg-zinc-900/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         <div className="flex items-center gap-8">
           <Link href="/dashboard" className="flex items-center gap-2">

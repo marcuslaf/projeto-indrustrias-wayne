@@ -185,7 +185,7 @@ export function ResourcesClient({ resources: initialResources, userRole }: Resou
         </svg>
       </div>
       <Navbar userRole={userRole} />
-      <main className="relative mx-auto max-w-7xl px-4 py-8">
+      <main className="relative mx-auto max-w-7xl px-4 py-8 pt-20">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-zinc-100">Gestão de Recursos</h1>
           <p className="text-zinc-400 mt-1">

@@ -73,7 +73,7 @@ export function AdminUsersClient({ profiles: initialProfiles, userRole }: AdminU
           </svg>
         </div>
         <Navbar userRole={userRole} />
-        <main className="relative mx-auto max-w-7xl px-4 py-8">
+        <main className="relative mx-auto max-w-7xl px-4 py-8 pt-20">
           <Card className="bg-zinc-900 border-zinc-800">
             <CardContent className="py-12 text-center">
               <p className="text-zinc-400">Você não tem permissão para acessar esta página.</p>
@@ -160,7 +160,7 @@ export function AdminUsersClient({ profiles: initialProfiles, userRole }: AdminU
         </svg>
       </div>
       <Navbar userRole={userRole} />
-      <main className="relative mx-auto max-w-7xl px-4 py-8">
+      <main className="relative mx-auto max-w-7xl px-4 py-8 pt-20">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-zinc-100">Gestão de Usuários</h1>
           <p className="text-zinc-400 mt-1">Administre os usuários do sistema.</p>
