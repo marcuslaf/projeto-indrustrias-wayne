@@ -48,6 +48,7 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
 
   return (
     <div className="relative min-h-screen bg-zinc-950">
+      <div className="absolute inset-0 bg-[url('/gotham-bg.jpg')] bg-cover bg-center opacity-[0.12] pointer-events-none" />
       <div
         className="absolute inset-0 opacity-[0.03] pointer-events-none"
         style={{

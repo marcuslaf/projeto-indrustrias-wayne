@@ -62,6 +62,7 @@ export default function LoginPage() {
 
   return (
     <div className="relative min-h-screen bg-zinc-950 flex items-center justify-center p-4 overflow-hidden">
+      <div className="absolute inset-0 bg-[url('/gotham-bg.jpg')] bg-cover bg-center opacity-[0.12] pointer-events-none" />
       <div
         className="absolute inset-0 opacity-[0.04]"
         style={{
