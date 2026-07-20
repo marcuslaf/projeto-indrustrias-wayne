@@ -55,9 +55,25 @@ export function AdminUsersClient({ profiles: initialProfiles, userRole }: AdminU
 
   if (userRole !== 'admin_seguranca') {
     return (
-      <div className="min-h-screen bg-zinc-950">
+      <div className="relative min-h-screen bg-zinc-950">
+        <div
+          className="absolute inset-0 opacity-[0.03] pointer-events-none"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(168,85,247,1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(168,85,247,1) 1px, transparent 1px)
+            `,
+            backgroundSize: '48px 48px',
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-purple-950/15 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute top-8 left-1/2 -translate-x-1/2 text-center opacity-[0.03] pointer-events-none select-none">
+          <svg viewBox="0 0 600 120" className="w-[700px] h-[140px]" fill="currentColor" color="white">
+            <text x="300" y="80" textAnchor="middle" fontSize="64" fontWeight="900" fontFamily="sans-serif" letterSpacing="12">INDÚSTRIAS WAYNE</text>
+          </svg>
+        </div>
         <Navbar userRole={userRole} />
-        <main className="mx-auto max-w-7xl px-4 py-8">
+        <main className="relative mx-auto max-w-7xl px-4 py-8">
           <Card className="bg-zinc-900 border-zinc-800">
             <CardContent className="py-12 text-center">
               <p className="text-zinc-400">Você não tem permissão para acessar esta página.</p>
@@ -126,9 +142,25 @@ export function AdminUsersClient({ profiles: initialProfiles, userRole }: AdminU
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950">
+    <div className="relative min-h-screen bg-zinc-950">
+      <div
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(168,85,247,1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(168,85,247,1) 1px, transparent 1px)
+          `,
+          backgroundSize: '48px 48px',
+        }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-purple-950/15 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute top-8 left-1/2 -translate-x-1/2 text-center opacity-[0.03] pointer-events-none select-none">
+        <svg viewBox="0 0 600 120" className="w-[700px] h-[140px]" fill="currentColor" color="white">
+          <text x="300" y="80" textAnchor="middle" fontSize="64" fontWeight="900" fontFamily="sans-serif" letterSpacing="12">INDÚSTRIAS WAYNE</text>
+        </svg>
+      </div>
       <Navbar userRole={userRole} />
-      <main className="mx-auto max-w-7xl px-4 py-8">
+      <main className="relative mx-auto max-w-7xl px-4 py-8">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-zinc-100">Gestão de Usuários</h1>
           <p className="text-zinc-400 mt-1">Administre os usuários do sistema.</p>

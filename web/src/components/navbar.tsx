@@ -11,6 +11,27 @@ interface NavbarProps {
   userRole: string
 }
 
+function WayneSmallLogo() {
+  return (
+    <svg viewBox="0 0 120 120" className="h-8 w-8" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="nav-logo-grad" x1="20" y1="20" x2="100" y2="100">
+          <stop offset="0%" stopColor="#a855f7" />
+          <stop offset="100%" stopColor="#818cf8" />
+        </linearGradient>
+      </defs>
+      <rect x="6" y="6" width="108" height="108" rx="24" stroke="url(#nav-logo-grad)" strokeWidth="2.5" />
+      <path
+        d="M28 40 L40 85 L60 55 L80 85 L92 40"
+        stroke="url(#nav-logo-grad)"
+        strokeWidth="5.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
 export function Navbar({ userRole }: NavbarProps) {
   const pathname = usePathname()
   const router = useRouter()
@@ -32,16 +53,16 @@ export function Navbar({ userRole }: NavbarProps) {
   }
 
   return (
-    <header className="border-b border-zinc-800 bg-zinc-900/50 backdrop-blur-sm">
+    <header className="border-b border-zinc-800 bg-zinc-900/60 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         <div className="flex items-center gap-8">
           <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-600/10">
-              <svg className="h-4 w-4 text-purple-500" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-6h-2v6zm0-8h2V7h-2v2z" />
-              </svg>
-            </div>
-            <span className="text-lg font-semibold text-zinc-100">Indústrias Wayne</span>
+            <WayneSmallLogo />
+            <span className="text-lg font-bold tracking-tight">
+              <span className="bg-gradient-to-r from-purple-400 to-indigo-300 bg-clip-text text-transparent">
+                Indústrias Wayne
+              </span>
+            </span>
           </Link>
           <nav className="hidden md:flex items-center gap-1">
             {links.map((link) => {
