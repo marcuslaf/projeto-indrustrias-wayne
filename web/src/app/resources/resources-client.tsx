@@ -180,8 +180,8 @@ export function ResourcesClient({ resources: initialResources, userRole }: Resou
       />
       <div className="absolute inset-0 bg-gradient-to-b from-purple-950/15 via-transparent to-transparent pointer-events-none" />
       <div className="absolute top-8 left-1/2 -translate-x-1/2 text-center opacity-[0.03] pointer-events-none select-none">
-        <svg viewBox="0 0 600 120" className="w-[700px] h-[140px]" fill="currentColor" color="white">
-          <text x="300" y="80" textAnchor="middle" fontSize="64" fontWeight="900" fontFamily="sans-serif" letterSpacing="12">INDÚSTRIAS WAYNE</text>
+        <svg viewBox="0 0 1000 120" className="w-[800px] h-[110px]" fill="currentColor" color="white">
+          <text x="500" y="80" textAnchor="middle" fontSize="56" fontWeight="900" fontFamily="sans-serif" letterSpacing="14">INDÚSTRIAS WAYNE</text>
         </svg>
       </div>
       <Navbar userRole={userRole} />
