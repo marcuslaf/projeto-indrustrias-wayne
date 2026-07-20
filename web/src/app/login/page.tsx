@@ -134,7 +134,7 @@ export default function LoginPage() {
                 placeholder="admin, gerente, funcionario"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="bg-zinc-800/50 border-zinc-700 text-zinc-100 placeholder:text-zinc-500 focus:border-purple-500/50 focus:ring-purple-500/20 transition-all"
+                className="bg-zinc-800/20 border-zinc-700/50 text-zinc-100 placeholder:text-zinc-500 focus:border-purple-500/50 focus:ring-purple-500/20 transition-all"
                 required
               />
             </div>
@@ -146,7 +146,7 @@ export default function LoginPage() {
                 placeholder="Sua senha"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="bg-zinc-800/50 border-zinc-700 text-zinc-100 focus:border-purple-500/50 focus:ring-purple-500/20 transition-all"
+                className="bg-zinc-800/20 border-zinc-700/50 text-zinc-100 focus:border-purple-500/50 focus:ring-purple-500/20 transition-all"
                 required
               />
             </div>
