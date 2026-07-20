@@ -111,7 +111,7 @@ export default function LoginPage() {
         }}
       />
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-800/20 to-transparent" />
-      <Card className="relative w-full max-w-md bg-zinc-900/40 backdrop-blur-xl border-zinc-800/40 shadow-2xl shadow-purple-900/15">
+      <Card className="relative w-full max-w-md bg-zinc-900/20 backdrop-blur-2xl border-zinc-800/30 shadow-2xl shadow-purple-900/15">
         <CardHeader className="text-center pt-8">
           <div className="mx-auto mb-4">
             <WayneLogo />
