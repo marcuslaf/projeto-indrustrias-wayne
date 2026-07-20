@@ -78,7 +78,7 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
           {cards.map((card) => {
             const Icon = card.icon
             return (
-              <Card key={card.title} className="bg-zinc-900 border-zinc-800">
+              <Card key={card.title} className="bg-zinc-900/10 border-zinc-700/30">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium text-zinc-400">{card.title}</CardTitle>
                   <Icon className={`h-4 w-4 ${card.color}`} />
@@ -92,7 +92,7 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
-          <Card className="bg-zinc-900 border-zinc-800">
+          <Card className="bg-zinc-900/10 border-zinc-700/30">
             <CardHeader>
               <CardTitle className="text-lg text-zinc-100 flex items-center gap-2">
                 <Activity className="h-5 w-5 text-purple-500" />
@@ -122,7 +122,7 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
             </CardContent>
           </Card>
 
-          <Card className="bg-zinc-900 border-zinc-800">
+          <Card className="bg-zinc-900/10 border-zinc-700/30">
             <CardHeader>
               <CardTitle className="text-lg text-zinc-100 flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 text-amber-500" />

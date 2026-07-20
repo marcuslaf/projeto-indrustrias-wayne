@@ -195,7 +195,7 @@ export function ResourcesClient({ resources: initialResources, userRole }: Resou
         </div>
 
         {canManage(userRole) && (
-          <Card className="mb-8 bg-zinc-900 border-zinc-800">
+          <Card className="mb-8 bg-zinc-900/10 border-zinc-700/30">
             <CardHeader>
               <CardTitle className="text-lg text-zinc-100">
                 {editingId ? 'Editar Recurso' : 'Adicionar Recurso'}
@@ -279,7 +279,7 @@ export function ResourcesClient({ resources: initialResources, userRole }: Resou
           />
         </div>
 
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card className="bg-zinc-900/10 border-zinc-700/30">
           <CardContent className="p-0">
             <Table>
               <TableHeader>
