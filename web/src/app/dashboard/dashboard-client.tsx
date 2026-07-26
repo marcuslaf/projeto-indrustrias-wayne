@@ -43,6 +43,7 @@ export interface DashboardStats {
   recentLogs: LogItem[]
   allLogs: LogItem[]
   maintenanceResources: ResourceItem[]
+  overdueMaintenance: { id: number; name: string }[]
   resourcesByType: { name: string; value: number }[]
   resourcesByStatus: { name: string; value: number }[]
   logsByDay: { day: string; sucesso: number; falha: number }[]
@@ -244,6 +245,24 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
             )
           })}
         </div>
+
+        {stats.overdueMaintenance.length > 0 && (
+          <Card className="mb-8 border-amber-700/40 bg-amber-950/10">
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-amber-400 mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-amber-300">
+                    {stats.overdueMaintenance.length} {stats.overdueMaintenance.length === 1 ? 'recurso com' : 'recursos com'} manutenção vencida
+                  </p>
+                  <p className="text-xs text-amber-400/70 mt-1">
+                    {stats.overdueMaintenance.map((r) => r.name).join(', ')}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <Tabs defaultValue="overview" className="mb-8">
           <TabsList className="bg-zinc-900 border border-zinc-800">

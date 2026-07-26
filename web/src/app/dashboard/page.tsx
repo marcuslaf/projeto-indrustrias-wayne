@@ -32,6 +32,14 @@ export default async function DashboardPage() {
     access_time: string; status: string; ip_address: string | null
   }[]
 
+  const oneYearAgo = new Date()
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1)
+
+  const overdueMaintenance = res.filter((r) => {
+    const refDate = r.last_maintenance_date ? new Date(r.last_maintenance_date) : new Date(r.acquisition_date)
+    return refDate < oneYearAgo
+  })
+
   const resourcesByType = ['equipamento', 'veiculo', 'dispositivo_seguranca']
     .map(type => ({ name: type, value: res.filter(r => r.type === type).length }))
     .filter(d => d.value > 0)
@@ -52,6 +60,7 @@ export default async function DashboardPage() {
     recentLogs: totalLogs.slice(0, 10),
     allLogs: totalLogs,
     maintenanceResources: res.filter(r => r.status === 'em_manutencao'),
+    overdueMaintenance: overdueMaintenance.map((r) => ({ id: r.id, name: r.name })),
     resourcesByType,
     resourcesByStatus,
     logsByDay: [],
