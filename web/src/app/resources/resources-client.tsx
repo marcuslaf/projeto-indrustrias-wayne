@@ -100,6 +100,28 @@ export function ResourcesClient({ resources: initialResources, userRole, default
     last_maintenance_date: '',
   })
 
+  const chips = [
+    { id: 'all', label: 'Todos', icon: null, type: 'all', status: 'all', color: 'text-zinc-400', border: 'border-zinc-700' },
+    { id: 'equipamento_em_uso', label: 'Equip. em Uso', icon: null, type: 'equipamento', status: 'em_uso', color: 'text-blue-400', border: 'border-blue-700/50' },
+    { id: 'veiculo_em_uso', label: 'Veículos em Operação', icon: null, type: 'veiculo', status: 'em_uso', color: 'text-emerald-400', border: 'border-emerald-700/50' },
+    { id: 'dispositivo_seguranca_em_uso', label: 'Disp. Segurança', icon: null, type: 'dispositivo_seguranca', status: 'em_uso', color: 'text-purple-400', border: 'border-purple-700/50' },
+    { id: 'em_manutencao', label: 'Em Manutenção', icon: null, type: 'all', status: 'em_manutencao', color: 'text-amber-400', border: 'border-amber-700/50' },
+  ] as const
+
+  const chipCounts = chips.map((chip) => ({
+    ...chip,
+    count: resources.filter((r) => {
+      if (chip.type !== 'all' && r.type !== chip.type) return false
+      if (chip.status !== 'all' && r.status !== chip.status) return false
+      return true
+    }).length,
+  }))
+
+  const activeChip = chips.find(
+    (c) => (c.type === filterType || (c.type === 'all' && filterType === 'all')) &&
+           (c.status === filterStatus || (c.status === 'all' && filterStatus === 'all'))
+  ) ?? chips[0]
+
   const filtered = resources.filter((r) => {
     if (filterType !== 'all' && r.type !== filterType) return false
     if (filterStatus !== 'all' && r.status !== filterStatus) return false
@@ -323,28 +345,34 @@ export function ResourcesClient({ resources: initialResources, userRole, default
               className="pl-10 bg-zinc-900 border-zinc-800 text-zinc-100 placeholder:text-zinc-500"
             />
           </div>
-          <Select value={filterType} onValueChange={(v) => v && setFilterType(v)}>
-            <SelectTrigger className="w-44 bg-zinc-900 border-zinc-800 text-zinc-300">
-              <SelectValue placeholder="Todos os tipos" />
-            </SelectTrigger>
-            <SelectContent className="bg-zinc-800 border-zinc-700 text-zinc-100">
-              <SelectItem value="all">Todos os tipos</SelectItem>
-              {typeOptions.map((o) => (
-                <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={filterStatus} onValueChange={(v) => v && setFilterStatus(v)}>
-            <SelectTrigger className="w-44 bg-zinc-900 border-zinc-800 text-zinc-300">
-              <SelectValue placeholder="Todos os status" />
-            </SelectTrigger>
-            <SelectContent className="bg-zinc-800 border-zinc-700 text-zinc-100">
-              <SelectItem value="all">Todos os status</SelectItem>
-              {statusOptions.map((o) => (
-                <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        </div>
+
+        <div className="flex flex-wrap gap-2 mb-4">
+          {chipCounts.map((chip) => {
+            const isActive = activeChip.id === chip.id
+            return (
+              <button
+                key={chip.id}
+                onClick={() => {
+                  setFilterType(chip.type)
+                  setFilterStatus(chip.status)
+                }}
+                className={`
+                  inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium
+                  border transition-all
+                  ${isActive
+                    ? `${chip.color} ${chip.border} bg-zinc-800/80`
+                    : 'text-zinc-500 border-zinc-800 hover:border-zinc-700 hover:text-zinc-300 bg-transparent'
+                  }
+                `}
+              >
+                <span>{chip.label}</span>
+                <span className={`text-xs ${isActive ? 'opacity-80' : 'text-zinc-600'}`}>
+                  {chip.count}
+                </span>
+              </button>
+            )
+          })}
         </div>
 
         <Card className="bg-zinc-900/10 border-zinc-700/30">
