@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Navbar } from '@/components/navbar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -25,8 +26,20 @@ import {
 } from '@/components/ui/table'
 import { Toaster, toast } from 'sonner'
 import { createClient } from '@/lib/supabase-client'
-import { Search, Plus, Pencil, Trash2, Loader2 } from 'lucide-react'
+import { Search, Pencil, Trash2, Loader2, ExternalLink } from 'lucide-react'
+import { z } from 'zod'
 import type { Resource, ResourceType, ResourceStatus } from '@/db/schema'
+
+const resourceSchema = z.object({
+  name: z.string().min(1, 'Nome é obrigatório'),
+  type: z.enum(['equipamento', 'veiculo', 'dispositivo_seguranca']),
+  serial_number: z.string().nullable().optional(),
+  plate: z.string().nullable().optional(),
+  location: z.string().min(1, 'Localização é obrigatória'),
+  status: z.enum(['disponivel', 'em_uso', 'em_manutencao']),
+  acquisition_date: z.string().min(1, 'Data de aquisição é obrigatória'),
+  last_maintenance_date: z.string().nullable().optional(),
+})
 
 interface ResourcesClientProps {
   resources: Resource[]
@@ -92,22 +105,27 @@ export function ResourcesClient({ resources: initialResources, userRole }: Resou
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!form.name || !form.type || !form.location || !form.status || !form.acquisition_date) {
-      toast.error('Preencha todos os campos obrigatórios.')
-      return
-    }
     setLoading(true)
 
-    const payload = {
+    const parsed = resourceSchema.safeParse({
       name: form.name,
-      type: form.type as ResourceType,
+      type: form.type || undefined,
       serial_number: form.serial_number || null,
       plate: form.plate || null,
       location: form.location,
-      status: form.status as ResourceStatus,
+      status: form.status || undefined,
       acquisition_date: form.acquisition_date,
       last_maintenance_date: form.last_maintenance_date || null,
+    })
+
+    if (!parsed.success) {
+      const firstError = parsed.error.errors[0]?.message ?? 'Dados inválidos'
+      toast.error(firstError)
+      setLoading(false)
+      return
     }
+
+    const payload = parsed.data
 
     if (editingId) {
       const { error } = await supabase
@@ -122,9 +140,10 @@ export function ResourcesClient({ resources: initialResources, userRole }: Resou
       }
       toast.success('Recurso atualizado com sucesso!')
     } else {
+      const { data: { user } } = await supabase.auth.getUser()
       const { error } = await supabase
         .from('resources')
-        .insert(payload)
+        .insert({ ...payload, created_by: user?.id ?? null })
 
       if (error) {
         toast.error(error.message)
@@ -304,7 +323,12 @@ export function ResourcesClient({ resources: initialResources, userRole }: Resou
                 ) : (
                   filtered.map((resource) => (
                     <TableRow key={resource.id} className="border-zinc-800 hover:bg-zinc-800/50">
-                      <TableCell className="font-medium text-zinc-100">{resource.name}</TableCell>
+                      <TableCell className="font-medium">
+                        <Link href={`/resources/${resource.id}`} className="text-purple-400 hover:text-purple-300 hover:underline transition-colors flex items-center gap-1">
+                          {resource.name}
+                          <ExternalLink className="h-3 w-3" />
+                        </Link>
+                      </TableCell>
                       <TableCell className="text-zinc-300">{typeLabel[resource.type]}</TableCell>
                       <TableCell>
                         <Badge variant={statusVariant[resource.status]}>
@@ -314,12 +338,22 @@ export function ResourcesClient({ resources: initialResources, userRole }: Resou
                       <TableCell className="text-zinc-300">{resource.location}</TableCell>
                       <TableCell>
                         <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => router.push(`/resources/${resource.id}`)}
+                            className="h-8 w-8 text-zinc-400 hover:text-zinc-100"
+                            title="Ver detalhes"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </Button>
                           {canManage(userRole) && (
                             <Button
                               variant="ghost"
                               size="icon"
                               onClick={() => startEdit(resource)}
                               className="h-8 w-8 text-zinc-400 hover:text-zinc-100"
+                              title="Editar"
                             >
                               <Pencil className="h-4 w-4" />
                             </Button>
@@ -330,6 +364,7 @@ export function ResourcesClient({ resources: initialResources, userRole }: Resou
                               size="icon"
                               onClick={() => handleDelete(resource.id)}
                               className="h-8 w-8 text-red-400 hover:text-red-300"
+                              title="Excluir"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>

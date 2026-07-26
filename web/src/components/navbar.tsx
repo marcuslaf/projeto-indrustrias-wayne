@@ -4,8 +4,11 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase-client'
 import { Button } from '@/components/ui/button'
-import { LogOut, LayoutDashboard, Package, Users } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import {
+  LogOut, LayoutDashboard, Package, Users, User, ShieldAlert, Menu,
+} from 'lucide-react'
+import { useState } from 'react'
 
 interface NavbarProps {
   userRole: string
@@ -36,10 +39,13 @@ export function Navbar({ userRole }: NavbarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   const links = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/resources', label: 'Recursos', icon: Package },
+    { href: '/logs', label: 'Logs', icon: ShieldAlert },
+    { href: '/profile', label: 'Perfil', icon: User },
   ]
 
   if (userRole === 'admin_seguranca') {
@@ -53,7 +59,7 @@ export function Navbar({ userRole }: NavbarProps) {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-700/30 bg-zinc-900/10">
+    <header className="sticky top-0 z-50 border-b border-zinc-700/30 bg-zinc-900/10 backdrop-blur-sm">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         <div className="flex items-center gap-8">
           <Link href="/dashboard" className="flex items-center gap-2">
@@ -85,15 +91,55 @@ export function Navbar({ userRole }: NavbarProps) {
             })}
           </nav>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleLogout}
-          className="text-zinc-400 hover:text-zinc-100"
-        >
-          <LogOut className="h-4 w-4 mr-2" />
-          Sair
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLogout}
+            className="hidden md:flex text-zinc-400 hover:text-zinc-100"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Sair
+          </Button>
+          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden text-zinc-400 hover:text-zinc-100">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="bg-zinc-900 border-zinc-800 w-64">
+              <div className="flex flex-col gap-1 mt-8">
+                {links.map((link) => {
+                  const Icon = link.icon
+                  const isActive = pathname === link.href
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setMobileOpen(false)}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-colors ${
+                        isActive
+                          ? 'bg-zinc-800 text-zinc-100'
+                          : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50'
+                      }`}
+                    >
+                      <Icon className="h-5 w-5" />
+                      {link.label}
+                    </Link>
+                  )
+                })}
+                <hr className="my-2 border-zinc-800" />
+                <button
+                  onClick={() => { handleLogout(); setMobileOpen(false) }}
+                  className="flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium text-red-400 hover:text-red-300 hover:bg-zinc-800/50 transition-colors"
+                >
+                  <LogOut className="h-5 w-5" />
+                  Sair
+                </button>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
     </header>
   )
