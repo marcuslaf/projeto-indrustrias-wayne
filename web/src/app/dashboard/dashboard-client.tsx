@@ -407,7 +407,7 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
                             <Cell key={`cell-${index}`} fill={typeColor[entry.name] ?? CHART_COLORS[index % CHART_COLORS.length]} />
                           ))}
                         </Pie>
-                        <Tooltip content={<CustomTooltip />} />
+                        <Tooltip content={<CustomTooltip />} contentStyle={{ background: 'transparent', border: 'none' }} />
                         <Legend
                           formatter={(value: string) => <span className="text-zinc-400 text-sm">{typeLabel[value] ?? value}</span>}
                         />
@@ -437,7 +437,7 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
                           axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
                           allowDecimals={false}
                         />
-                        <Tooltip content={<CustomTooltip />} />
+                        <Tooltip content={<CustomTooltip />} contentStyle={{ background: 'transparent', border: 'none' }} />
                         <Bar dataKey="value" name="Recursos" radius={[4, 4, 0, 0]}>
                           {stats.resourcesByStatus.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={statusColor[entry.name] ?? CHART_COLORS[index % CHART_COLORS.length]} />
@@ -469,7 +469,7 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
                             axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
                             allowDecimals={false}
                           />
-                          <Tooltip content={<CustomTooltip />} />
+                          <Tooltip content={<CustomTooltip />} contentStyle={{ background: 'transparent', border: 'none' }} />
                           <Legend
                             formatter={(value: string) => <span className="text-zinc-400 text-sm">{value === 'sucesso' ? 'Sucesso' : 'Falha'}</span>}
                           />
