@@ -16,10 +16,10 @@ export async function DELETE(request: Request) {
 
   const { userId } = await request.json()
 
-  const { error } = await (supabase.rpc as any)('admin_delete_user', { user_id: userId })
+  const { error } = await supabase.rpc('admin_delete_user', { user_id: userId })
 
   if (error) {
-    return NextResponse.json({ error: (error as { message: string }).message }, { status: 500 })
+    return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
   return NextResponse.json({ message: 'Usuário excluído' })

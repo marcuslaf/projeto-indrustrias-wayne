@@ -1,5 +1,6 @@
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { AdminUsersClient } from './admin-users-client'
+import type { Profile } from '@/db/schema'
 
 export default async function AdminUsersPage() {
   const supabase = await createServerSupabaseClient()
@@ -14,7 +15,7 @@ export default async function AdminUsersPage() {
 
   return (
     <AdminUsersClient
-      profiles={(profiles ?? []) as never[]}
+      profiles={(profiles ?? []) as Profile[]}
       userRole={userRole}
     />
   )

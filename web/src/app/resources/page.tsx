@@ -1,5 +1,6 @@
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { ResourcesClient } from './resources-client'
+import type { Resource } from '@/db/schema'
 
 export default async function ResourcesPage() {
   const supabase = await createServerSupabaseClient()
@@ -15,7 +16,7 @@ export default async function ResourcesPage() {
 
   return (
     <ResourcesClient
-      resources={(resources ?? []) as never[]}
+      resources={(resources ?? []) as Resource[]}
       userRole={userRole}
     />
   )
