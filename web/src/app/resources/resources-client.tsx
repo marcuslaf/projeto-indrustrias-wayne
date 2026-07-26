@@ -47,6 +47,8 @@ const resourceSchema = z.object({
 interface ResourcesClientProps {
   resources: Resource[]
   userRole: string
+  defaultType?: Resource['type']
+  defaultStatus?: Resource['status']
 }
 
 const typeOptions: { value: ResourceType; label: string }[] = [
@@ -76,11 +78,13 @@ const typeLabel: Record<string, string> = {
 const canManage = (role: string) => role === 'admin_seguranca' || role === 'gerente'
 const canDelete = (role: string) => role === 'admin_seguranca'
 
-export function ResourcesClient({ resources: initialResources, userRole }: ResourcesClientProps) {
+export function ResourcesClient({ resources: initialResources, userRole, defaultType, defaultStatus }: ResourcesClientProps) {
   const router = useRouter()
   const supabase = createClient()
   const [resources, setResources] = useState<Resource[]>(initialResources)
   const [search, setSearch] = useState('')
+  const [filterType, setFilterType] = useState<string>(defaultType ?? 'all')
+  const [filterStatus, setFilterStatus] = useState<string>(defaultStatus ?? 'all')
   const [editingId, setEditingId] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
   const { confirm: confirmDelete, dialog: confirmDialog } = useConfirmDialog()
@@ -96,11 +100,14 @@ export function ResourcesClient({ resources: initialResources, userRole }: Resou
     last_maintenance_date: '',
   })
 
-  const filtered = resources.filter((r) =>
-    r.name.toLowerCase().includes(search.toLowerCase()) ||
-    r.type.toLowerCase().includes(search.toLowerCase()) ||
-    r.location.toLowerCase().includes(search.toLowerCase())
-  )
+  const filtered = resources.filter((r) => {
+    if (filterType !== 'all' && r.type !== filterType) return false
+    if (filterStatus !== 'all' && r.status !== filterStatus) return false
+    if (search && !r.name.toLowerCase().includes(search.toLowerCase()) &&
+        !r.type.toLowerCase().includes(search.toLowerCase()) &&
+        !r.location.toLowerCase().includes(search.toLowerCase())) return false
+    return true
+  })
 
   function resetForm() {
     setForm({ name: '', type: '', serial_number: '', plate: '', location: '', status: '', acquisition_date: '', last_maintenance_date: '' })
@@ -306,14 +313,38 @@ export function ResourcesClient({ resources: initialResources, userRole }: Resou
           </Card>
         )}
 
-        <div className="relative mb-4">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-          <Input
-            placeholder="Buscar recursos..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10 bg-zinc-900 border-zinc-800 text-zinc-100 placeholder:text-zinc-500"
-          />
+        <div className="flex flex-col sm:flex-row gap-3 mb-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+            <Input
+              placeholder="Buscar recursos..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-10 bg-zinc-900 border-zinc-800 text-zinc-100 placeholder:text-zinc-500"
+            />
+          </div>
+          <Select value={filterType} onValueChange={(v) => v && setFilterType(v)}>
+            <SelectTrigger className="w-44 bg-zinc-900 border-zinc-800 text-zinc-300">
+              <SelectValue placeholder="Todos os tipos" />
+            </SelectTrigger>
+            <SelectContent className="bg-zinc-800 border-zinc-700 text-zinc-100">
+              <SelectItem value="all">Todos os tipos</SelectItem>
+              {typeOptions.map((o) => (
+                <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={filterStatus} onValueChange={(v) => v && setFilterStatus(v)}>
+            <SelectTrigger className="w-44 bg-zinc-900 border-zinc-800 text-zinc-300">
+              <SelectValue placeholder="Todos os status" />
+            </SelectTrigger>
+            <SelectContent className="bg-zinc-800 border-zinc-700 text-zinc-100">
+              <SelectItem value="all">Todos os status</SelectItem>
+              {statusOptions.map((o) => (
+                <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <Card className="bg-zinc-900/10 border-zinc-700/30">

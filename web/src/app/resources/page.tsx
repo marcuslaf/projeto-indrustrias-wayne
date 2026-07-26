@@ -2,7 +2,10 @@ import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { ResourcesClient } from './resources-client'
 import type { Resource } from '@/db/schema'
 
-export default async function ResourcesPage() {
+export default async function ResourcesPage(props: {
+  searchParams: Promise<{ type?: string; status?: string }>
+}) {
+  const searchParams = await props.searchParams
   const supabase = await createServerSupabaseClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -18,6 +21,8 @@ export default async function ResourcesPage() {
     <ResourcesClient
       resources={(resources ?? []) as Resource[]}
       userRole={userRole}
+      defaultType={searchParams.type as Resource['type'] | undefined}
+      defaultStatus={searchParams.status as Resource['status'] | undefined}
     />
   )
 }
