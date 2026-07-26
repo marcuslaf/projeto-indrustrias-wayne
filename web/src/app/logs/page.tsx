@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { createClient } from '@/lib/supabase-client'
-import { Search, Activity, ChevronLeft, ChevronRight, ShieldAlert, Filter } from 'lucide-react'
+import { Search, Activity, ChevronLeft, ChevronRight, ShieldAlert, Filter, RefreshCw } from 'lucide-react'
 
 const ITEMS_PER_PAGE = 15
 
@@ -26,21 +26,22 @@ export default function LogsPage() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [page, setPage] = useState(0)
+  const [refreshing, setRefreshing] = useState(false)
 
-  useEffect(() => {
-    async function load() {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) setUserRole(user.user_metadata?.role ?? 'funcionario')
-      const { data } = await supabase
-        .from('access_logs')
-        .select('*')
-        .order('access_time', { ascending: false })
-        .limit(100)
-      if (data) setLogs(data as any[])
-      setLoading(false)
-    }
-    load()
-  }, [])
+  async function loadLogs() {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) setUserRole(user.user_metadata?.role ?? 'funcionario')
+    const { data } = await supabase
+      .from('access_logs')
+      .select('*')
+      .order('access_time', { ascending: false })
+      .limit(100)
+    if (data) setLogs(data as any[])
+    setLoading(false)
+    setRefreshing(false)
+  }
+
+  useEffect(() => { loadLogs() }, [])
 
   const filtered = logs.filter((log) => {
     const matchSearch = !search || log.access_area.toLowerCase().includes(search.toLowerCase())
@@ -61,12 +62,23 @@ export default function LogsPage() {
       <div className="absolute inset-0 bg-gradient-to-b from-purple-950/15 via-transparent to-transparent pointer-events-none" />
       <Navbar userRole={userRole} />
       <main className="relative mx-auto max-w-5xl px-4 py-8 pt-20">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-zinc-100 flex items-center gap-2">
-            <ShieldAlert className="h-6 w-6 text-purple-500" />
-            Logs de Acesso
-          </h1>
-          <p className="text-zinc-400 mt-1">Registro de todas as atividades e acessos ao sistema.</p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-zinc-100 flex items-center gap-2">
+              <ShieldAlert className="h-6 w-6 text-purple-500" />
+              Logs de Acesso
+            </h1>
+            <p className="text-zinc-400 mt-1">Registro de todas as atividades e acessos ao sistema.</p>
+          </div>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => { setRefreshing(true); loadLogs() }}
+            disabled={refreshing}
+            className="border-zinc-800 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 h-9 w-9"
+          >
+            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+          </Button>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 mb-6">

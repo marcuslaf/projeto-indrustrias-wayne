@@ -390,7 +390,7 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
                         </Pie>
                         <Tooltip content={<CustomTooltip />} />
                         <Legend
-                          formatter={(value) => <span className="text-zinc-400 text-sm">{typeLabel[value] ?? value}</span>}
+                          formatter={(value: string) => <span className="text-zinc-400 text-sm">{typeLabel[value] ?? value}</span>}
                         />
                       </PieChart>
                     </ResponsiveContainer>
@@ -452,7 +452,7 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
                           />
                           <Tooltip content={<CustomTooltip />} />
                           <Legend
-                            formatter={(value) => <span className="text-zinc-400 text-sm">{value === 'sucesso' ? 'Sucesso' : 'Falha'}</span>}
+                            formatter={(value: string) => <span className="text-zinc-400 text-sm">{value === 'sucesso' ? 'Sucesso' : 'Falha'}</span>}
                           />
                           <Bar dataKey="sucesso" name="sucesso" fill="#22c55e" radius={[4, 4, 0, 0]} stackId="a" />
                           <Bar dataKey="falha" name="falha" fill="#ef4444" radius={[4, 4, 0, 0]} stackId="a" />
