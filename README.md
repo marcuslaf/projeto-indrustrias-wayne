@@ -1,117 +1,113 @@
-# Indústrias Wayne — Gestão de Recursos e Segurança | Wayne Industries — Resource & Security Management
+# Indústrias Wayne — Gestão de Recursos e Segurança
 
-## 🇧🇷 Português
+Sistema full-stack de gestão empresarial da **Indústrias Wayne** (Universo Batman). Gerencia equipamentos, veículos e dispositivos de segurança com RBAC, dashboard interativo e audit trail. Construído com **Next.js 16 + Supabase**.
 
-Sistema full-stack para gerenciamento de recursos e controle de segurança da **Indústrias Wayne** (Universo Batman). Permite administrar equipamentos, veículos e dispositivos de segurança com controle de acesso baseado em papéis (RBAC). Construído com **Next.js 16 + Supabase**.
-
-## 🇺🇸 English
-
-Full-stack resource management and security control system for **Wayne Industries** (Batman Universe). Manage equipment, vehicles, and security devices with role-based access control (RBAC). Built with **Next.js 16 + Supabase**.
+**Deploy:** https://web-green-eta-ooechjq01q.vercel.app
 
 ---
 
-## ✨ Features | Funcionalidades
+## Funcionalidades
 
-| Feature | Descrição | Description |
-|---------|-----------|-------------|
-| 🔐 **Autenticação** | Supabase Auth (email+senha), sessão via cookies | Supabase Auth (email+password), cookie sessions |
-| 📊 **Dashboard** | Estatísticas em tempo real, atividade recente, manutenção | Real-time stats, recent activity, maintenance |
-| 📦 **Gestão de Recursos** | CRUD completo com busca e soft-delete | Full CRUD with search and soft-delete |
-| 👥 **Admin de Usuários** | Criação/exclusão com atribuição de papéis | Create/delete users with role assignment |
-| 🛡️ **RBAC** | funcionario (view), gerente (manage), admin_seguranca (full) | Role-based access control |
-| 🎨 **Interface Moderna** | Tema escuro, responsivo, shadcn/ui + Tailwind | Dark theme, responsive, shadcn/ui + Tailwind |
-
----
-
-## 🛠️ Tech Stack | Pilha Tecnológica
-
-| Camada / Layer | Tecnologia / Technology |
-|----------------|------------------------|
-| **Frontend** | Next.js 16 (App Router), React 19, TypeScript |
-| **UI** | shadcn/ui, Tailwind CSS, Lucide React |
-| **Backend** | Supabase (PostgreSQL, Auth, RLS, Edge Functions) |
-| **Auth** | Supabase Auth com @supabase/ssr |
-| **Database** | PostgreSQL (Supabase) com RLS policies |
-| **Deploy** | Next.js → Vercel, Supabase (projeto jxdvpluzicymdkqwzzyy) |
+| Funcionalidade | Descrição |
+|----------------|-----------|
+| **Dashboard** | Cards com estatísticas, gráficos Recharts (pizza/barras), filtro por período, 3 abas (Visão Geral, Atividade, Gráficos) |
+| **Gestão de Recursos** | CRUD completo com validação Zod, soft-delete, busca, detalhes com edição inline |
+| **Perfil** | Edição de nome e alteração de senha |
+| **Logs de Atividade** | Access logs paginados com busca e filtro |
+| **Admin de Usuários** | Criação/exclusão com atribuição de papéis (admin_seguranca) |
+| **RBAC** | `funcionario` (view), `gerente` (manage), `admin_seguranca` (full) |
+| **Audit Trail** | Tabela `audit_logs` com trigger automático em resources |
+| **Mobile** | Navbar responsiva com menu hamburger (Sheet shadcn/ui) |
 
 ---
 
-## 📁 Project Structure | Estrutura do Projeto
+## Stack
 
-`
+| Camada | Tecnologia |
+|--------|------------|
+| **Frontend** | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4 |
+| **UI** | shadcn/ui, Lucide React, Recharts |
+| **Backend** | Supabase (PostgreSQL, Auth, RLS) |
+| **Auth** | Supabase Auth + `@supabase/ssr` |
+| **Database** | PostgreSQL, RLS policies, triggers, enum types |
+| **Testes** | Vitest + Testing Library |
+| **CI/CD** | GitHub Actions, Husky, lint-staged, commitlint |
+| **Deploy** | Vercel (projeto `industrias-wayne`), Supabase (`jxdvpluzicymdkqwzzyy`) |
+
+---
+
+## Estrutura
+
+```
 industrias-wayne/
-├── web/                          # Next.js application
+├── web/                          # Next.js app
 │   ├── src/
 │   │   ├── app/
-│   │   │   ├── login/            # Login page
-│   │   │   ├── dashboard/        # Main dashboard
-│   │   │   ├── resources/        # Resource CRUD
-│   │   │   ├── admin/users/      # User management
-│   │   │   └── api/              # API routes (admin, seed)
-│   │   ├── components/           # shadcn/ui components
-│   │   ├── lib/                  # Supabase clients, types
-│   │   └── db/                   # Schema types
-│   ├── middleware.ts             # Auth guard (route protection)
-│   └── .env.local                # Supabase config
+│   │   │   ├── login/            # Login
+│   │   │   ├── dashboard/        # Dashboard interativo
+│   │   │   ├── resources/        # CRUD + [id] detalhes
+│   │   │   ├── profile/          # Editar perfil/senha
+│   │   │   ├── logs/             # Access logs
+│   │   │   ├── admin/users/      # Admin de usuários
+│   │   │   ├── api/seed/         # Seed de dados
+│   │   │   └── api/admin/users/  # Admin API
+│   │   ├── components/           # shadcn/ui components + Navbar
+│   │   └── lib/                  # Clients, types, helpers
+│   ├── middleware.ts             # Auth guard
+│   └── vercel.json               # Install config
 ├── supabase/
-│   └── migrations/               # SQL migrations
+│   └── migrations/               # Migrations SQL
+├── .github/workflows/ci.yml     # CI pipeline
+├── .husky/                       # Git hooks
 └── README.md
-`
+```
 
 ---
 
-## 🚀 How to Run | Como Rodar
+## Rodar localmente
 
-`ash
-# Prerequisites: Node.js 20+, npm/pnpm
-
-# 1. Install dependencies
+```bash
 cd web
 npm install
-
-# 2. Configure environment
-# Create web/.env.local with:
-# NEXT_PUBLIC_SUPABASE_URL=<your_url>
-# NEXT_PUBLIC_SUPABASE_ANON_KEY=<your_anon_key>
-
-# 3. Development
-npm run dev
-
-# 4. Production build
-npm run build
-`
+# Criar web/.env.local com:
+#   NEXT_PUBLIC_SUPABASE_URL=<url>
+#   NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon_key>
+npm run dev        # http://localhost:3000
+npm run build      # Produção
+npm run test       # Testes Vitest
+npm run lint       # ESLint
+npm run typecheck  # TypeScript
+```
 
 ---
 
-## 👤 Default Credentials | Credenciais Padrão
+## Credenciais padrão
 
-| Papel / Role | Usuário / Username | Senha / Password |
-|--------------|--------------------|------------------|
-| Admin de Segurança / Security Admin | admin | admin123 |
-| Gerente / Manager | gerente | gerente123 |
-| Funcionário / Employee | funcionario | funcionario123 |
+| Papel | Usuário | Senha |
+|-------|---------|-------|
+| Admin de Segurança | admin | admin123 |
+| Gerente | gerente | gerente123 |
+| Funcionário | funcionario | funcionario123 |
 
-> Login uses {username}@wayne.internal format (e.g., dmin@wayne.internal)
+> Login no formato `usuario@wayne.internal`
 
 ---
 
-## 🗄️ Database | Banco de Dados
+## Banco de Dados
 
-PostgreSQL schema with Supabase:
-
-- **profiles** — Perfis de usuário (vinculados ao auth.users via trigger)
-- **resources** — Recursos (equipamentos, veículos, dispositivos)
+- **profiles** — Perfis vinculados a `auth.users` via trigger
+- **resources** — Recursos (equipamentos, veículos, dispositivos_seguranca)
 - **access_logs** — Logs de acesso (append-only)
-- **user_role** enum: uncionario, gerente, dmin_seguranca
-- RLS ativo em todas as tabelas com policies granulares
-- Trigger on_auth_user_created para criar profile automaticamente
+- **audit_logs** — Audit trail (append-only, trigger em resources)
+- Enum `user_role`: `funcionario`, `gerente`, `admin_seguranca`
+- RLS ativo em todas as tabelas com policies granulares por operação
 
 ---
 
-## 📬 Contact | Contato
+## Contato
 
 **Marcus Lafaiete** — [GitHub](https://github.com/marcuslaf) · [LinkedIn](https://www.linkedin.com/in/marcuslaf)
 
-## License
+## Licença
 
-MIT — Projeto educacional / Educational project
+MIT — Projeto educacional
