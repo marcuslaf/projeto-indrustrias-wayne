@@ -28,6 +28,7 @@ import { toast } from 'sonner'
 import { Toaster } from '@/components/ui/sonner'
 import { createClient } from '@/lib/supabase-client'
 import { logAccess } from '@/lib/audit-log'
+import { useConfirmDialog } from '@/components/confirm-dialog'
 import { Search, Pencil, Trash2, Loader2, ExternalLink } from 'lucide-react'
 import { z } from 'zod'
 import type { Resource, ResourceType, ResourceStatus } from '@/db/schema'
@@ -82,6 +83,7 @@ export function ResourcesClient({ resources: initialResources, userRole }: Resou
   const [search, setSearch] = useState('')
   const [editingId, setEditingId] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
+  const { confirm: confirmDelete, dialog: confirmDialog } = useConfirmDialog()
 
   const [form, setForm] = useState({
     name: '',
@@ -178,7 +180,14 @@ export function ResourcesClient({ resources: initialResources, userRole }: Resou
   }
 
   async function handleDelete(id: number) {
-    if (!confirm('Tem certeza que deseja excluir este recurso?')) return
+    const confirmed = await confirmDelete({
+      title: 'Excluir Recurso',
+      description: 'Tem certeza que deseja excluir este recurso?',
+      confirmLabel: 'Excluir',
+      cancelLabel: 'Cancelar',
+      variant: 'destructive',
+    })
+    if (!confirmed) return
     const resource = resources.find(r => r.id === id)
     const { error } = await (supabase
       .from('resources') as any)
@@ -386,6 +395,7 @@ export function ResourcesClient({ resources: initialResources, userRole }: Resou
         </Card>
       </main>
       <Toaster richColors />
+      {confirmDialog}
     </div>
   )
 }
