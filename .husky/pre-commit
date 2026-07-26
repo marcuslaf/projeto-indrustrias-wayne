@@ -1,1 +1,1 @@
-cd web && pnpm lint-staged
+cd web && npx lint-staged
