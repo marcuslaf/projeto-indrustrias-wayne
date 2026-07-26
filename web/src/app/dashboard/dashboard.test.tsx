@@ -41,6 +41,9 @@ const mockStats: DashboardStats = {
   recentLogs: [
     { id: 1, access_area: 'Sala de Controle', access_time: '2026-07-26T10:00:00Z', status: 'sucesso' },
   ],
+  allLogs: [
+    { id: 1, access_area: 'Sala de Controle', access_time: '2026-07-26T10:00:00Z', status: 'sucesso' },
+  ],
   maintenanceResources: [
     { id: 1, name: 'Drone', type: 'dispositivo_seguranca', status: 'em_manutencao', last_maintenance_date: '2026-06-01', serial_number: null, plate: null, location: 'Hangar', acquisition_date: '2025-01-01' },
   ],
@@ -78,7 +81,7 @@ describe('DashboardClient', () => {
   })
 
   it('shows empty state when no logs', () => {
-    const emptyStats = { ...mockStats, recentLogs: [] }
+    const emptyStats = { ...mockStats, recentLogs: [], allLogs: [] }
     render(<DashboardClient profile={{ role: 'funcionario', nome: 'Test' }} stats={emptyStats} userRole="funcionario" />)
     expect(screen.getByText('Nenhuma atividade registrada ainda.')).toBeTruthy()
   })

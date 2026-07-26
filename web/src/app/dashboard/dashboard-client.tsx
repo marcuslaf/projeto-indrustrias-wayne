@@ -41,6 +41,7 @@ export interface DashboardStats {
   available: number
   inMaintenance: number
   recentLogs: LogItem[]
+  allLogs: LogItem[]
   maintenanceResources: ResourceItem[]
   resourcesByType: { name: string; value: number }[]
   resourcesByStatus: { name: string; value: number }[]
@@ -84,7 +85,38 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
   const [period, setPeriod] = useState('7')
   const [resourceFilter, setResourceFilter] = useState('all')
 
-  const filteredLogs = stats.recentLogs
+  const periodDays = Number(period)
+
+  const filteredLogs = periodDays === 0
+    ? stats.allLogs
+    : stats.allLogs.filter(log => {
+        const logDate = new Date(log.access_time)
+        const cutoff = new Date()
+        cutoff.setDate(cutoff.getDate() - periodDays)
+        return logDate >= cutoff
+      })
+
+  const logsByDay = (() => {
+    const dayMap = new Map<string, { sucesso: number; falha: number }>()
+    const today = new Date()
+    const daysToShow = periodDays || 7
+    for (let i = daysToShow - 1; i >= 0; i--) {
+      const d = new Date(today)
+      d.setDate(d.getDate() - i)
+      const key = d.toLocaleDateString('pt-BR')
+      dayMap.set(key, { sucesso: 0, falha: 0 })
+    }
+    for (const log of filteredLogs) {
+      const d = new Date(log.access_time).toLocaleDateString('pt-BR')
+      if (dayMap.has(d)) {
+        const entry = dayMap.get(d)!
+        if (log.status === 'sucesso') entry.sucesso++
+        else entry.falha++
+      }
+    }
+    return Array.from(dayMap.entries()).map(([day, value]) => ({ day, ...value }))
+  })()
+
   const filteredMaintenance = resourceFilter === 'all'
     ? stats.maintenanceResources
     : stats.maintenanceResources.filter(r => r.type === resourceFilter)
@@ -173,6 +205,7 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
                 <SelectItem value="7">Últimos 7 dias</SelectItem>
                 <SelectItem value="30">Últimos 30 dias</SelectItem>
                 <SelectItem value="90">Últimos 90 dias</SelectItem>
+                <SelectItem value="0">Todos os registros</SelectItem>
               </SelectContent>
             </Select>
             <Button
@@ -397,7 +430,7 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
                 </CardContent>
               </Card>
 
-              {stats.logsByDay.length > 0 && (
+              {logsByDay.length > 0 && logsByDay.some(d => d.sucesso > 0 || d.falha > 0) && (
                 <Card className="bg-zinc-900/10 border-zinc-700/30 lg:col-span-2">
                   <CardHeader>
                     <CardTitle className="text-lg text-zinc-100">Acessos por Dia</CardTitle>
@@ -405,7 +438,7 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
                   <CardContent>
                     <div className="h-72">
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={stats.logsByDay}>
+                        <BarChart data={logsByDay}>
                           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                           <XAxis
                             dataKey="day"
