@@ -26,6 +26,7 @@ import {
 import { toast } from 'sonner'
 import { Toaster } from '@/components/ui/sonner'
 import { createClient } from '@/lib/supabase-client'
+import { useConfirmDialog } from '@/components/confirm-dialog'
 import { Trash2, UserPlus, Loader2 } from 'lucide-react'
 
 interface ProfileItem {
@@ -53,6 +54,7 @@ export function AdminUsersClient({ profiles: initialProfiles, userRole }: AdminU
   const [profiles, setProfiles] = useState<ProfileItem[]>(initialProfiles)
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({ username: '', password: '', nome: '', email: '', role: '' })
+  const { confirm: confirmDelete, dialog: confirmDialog } = useConfirmDialog()
 
   if (userRole !== 'admin_seguranca') {
     return (
@@ -126,7 +128,14 @@ export function AdminUsersClient({ profiles: initialProfiles, userRole }: AdminU
   }
 
   async function handleDelete(id: string, username: string) {
-    if (!confirm(`Tem certeza que deseja excluir "${username}"?`)) return
+    const confirmed = await confirmDelete({
+      title: 'Excluir Usuário',
+      description: `Tem certeza que deseja excluir "${username}"?`,
+      confirmLabel: 'Excluir',
+      cancelLabel: 'Cancelar',
+      variant: 'destructive',
+    })
+    if (!confirmed) return
 
     const res = await fetch('/api/admin/users', {
       method: 'DELETE',
@@ -259,6 +268,7 @@ export function AdminUsersClient({ profiles: initialProfiles, userRole }: AdminU
         </Card>
       </main>
       <Toaster richColors />
+      {confirmDialog}
     </div>
   )
 }
