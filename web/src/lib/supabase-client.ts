@@ -29,6 +29,44 @@ export type Database = {
           user_id?: string | null
         }
       }
+      audit_logs: {
+        Row: {
+          id: number
+          org_id: string | null
+          user_id: string | null
+          action: string
+          entity: string
+          entity_id: string | null
+          old_data: Record<string, unknown> | null
+          new_data: Record<string, unknown> | null
+          ip_address: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: number
+          org_id?: string | null
+          user_id?: string | null
+          action: string
+          entity: string
+          entity_id?: string | null
+          old_data?: Record<string, unknown> | null
+          new_data?: Record<string, unknown> | null
+          ip_address?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: number
+          org_id?: string | null
+          user_id?: string | null
+          action?: string
+          entity?: string
+          entity_id?: string | null
+          old_data?: Record<string, unknown> | null
+          new_data?: Record<string, unknown> | null
+          ip_address?: string | null
+          created_at?: string
+        }
+      }
       profiles: {
         Row: {
           created_at: string
