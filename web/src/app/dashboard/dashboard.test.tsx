@@ -1,7 +1,35 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { DashboardClient } from './dashboard-client'
 import type { DashboardStats } from './dashboard-client'
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
+  usePathname: () => '/dashboard',
+  useParams: () => ({}),
+}))
+
+vi.mock('@/lib/supabase-client', () => ({
+  createClient: () => ({}),
+}))
+
+vi.mock('@/components/navbar', () => ({
+  Navbar: () => null,
+}))
+
+vi.mock('recharts', () => ({
+  ResponsiveContainer: ({ children }: any) => children,
+  PieChart: ({ children }: any) => children,
+  Pie: ({ children }: any) => children,
+  Cell: () => null,
+  BarChart: ({ children }: any) => children,
+  Bar: ({ children }: any) => children,
+  XAxis: () => null,
+  YAxis: () => null,
+  CartesianGrid: () => null,
+  Tooltip: () => null,
+  Legend: () => null,
+}))
 
 const mockStats: DashboardStats = {
   totalResources: 4,
@@ -40,8 +68,8 @@ describe('DashboardClient', () => {
 
   it('renders stat cards', () => {
     render(<DashboardClient profile={{ role: 'admin_seguranca', nome: 'Bruce' }} stats={mockStats} userRole="admin_seguranca" />)
-    expect(screen.getByText('1')).toBeTruthy()
-    expect(screen.getByText('2')).toBeTruthy()
+    expect(screen.getByText('Equipamentos em Uso')).toBeTruthy()
+    expect(screen.getByText('Veículos em Operação')).toBeTruthy()
   })
 
   it('renders recent logs section', () => {

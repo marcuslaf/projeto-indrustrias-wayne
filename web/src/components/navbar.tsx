@@ -102,10 +102,8 @@ export function Navbar({ userRole }: NavbarProps) {
             Sair
           </Button>
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden text-zinc-400 hover:text-zinc-100">
-                <Menu className="h-5 w-5" />
-              </Button>
+            <SheetTrigger className="md:hidden flex items-center justify-center h-9 w-9 rounded-md text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50 transition-colors">
+              <Menu className="h-5 w-5" />
             </SheetTrigger>
             <SheetContent side="right" className="bg-zinc-900 border-zinc-800 w-64">
               <div className="flex flex-col gap-1 mt-8">

@@ -48,7 +48,7 @@ export default function ProfilePage() {
     e.preventDefault()
     if (!nome.trim()) { toast.error('Nome não pode ficar vazio.'); return }
     setLoading(true)
-    const { error } = await supabase.from('profiles').update({ nome: nome.trim() } as any).eq('id', user.id)
+    const { error } = await (supabase.from('profiles') as any).update({ nome: nome.trim() }).eq('id', user.id)
     if (error) { toast.error(error.message); setLoading(false); return }
     toast.success('Perfil atualizado com sucesso!')
     setLoading(false)

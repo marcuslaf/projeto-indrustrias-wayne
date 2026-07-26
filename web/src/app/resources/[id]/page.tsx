@@ -67,9 +67,9 @@ export default function ResourceDetailPage() {
       if (!user) { router.push('/login'); return }
       setUserRole(user.user_metadata?.role ?? 'funcionario')
 
-      const { data } = await supabase.from('resources').select('*').eq('id', id).is('deleted_at', null).single()
-      if (!data) { router.push('/resources'); return }
-      const r = data as any
+    const { data } = await (supabase.from('resources') as any).select('*').eq('id', id).is('deleted_at', null).single()
+    if (!data) { router.push('/resources'); return }
+    const r = data as any
       setResource(r)
       setForm({
         name: r.name, type: r.type, serial_number: r.serial_number ?? '',
@@ -89,7 +89,7 @@ export default function ResourceDetailPage() {
       plate: form.plate || null, location: form.location, status: form.status,
       acquisition_date: form.acquisition_date, last_maintenance_date: form.last_maintenance_date || null,
     }
-    const { error } = await supabase.from('resources').update(payload as any).eq('id', id)
+    const { error } = await (supabase.from('resources') as any).update(payload).eq('id', id)
     if (error) { toast.error(error.message); setSaving(false); return }
     toast.success('Recurso atualizado!')
     setResource({ ...resource, ...payload })
@@ -152,14 +152,14 @@ export default function ResourceDetailPage() {
             </CardHeader>
             <CardContent>
               {editing ? (
-                <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v })}>
-                  <SelectTrigger className="bg-zinc-800 border-zinc-700 text-zinc-100">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-zinc-800 border-zinc-700 text-zinc-100">
-                    {statusOptions.map((o) => (<SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>))}
-                  </SelectContent>
-                </Select>
+                  <Select value={form.status} onValueChange={(v) => v && setForm({ ...form, status: v })}>
+                    <SelectTrigger className="bg-zinc-800 border-zinc-700 text-zinc-100">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-zinc-800 border-zinc-700 text-zinc-100">
+                      {statusOptions.map((o) => (<SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>))}
+                    </SelectContent>
+                  </Select>
               ) : (
                 <Badge className="text-base px-3 py-1">
                   {statusLabel[resource.status] ?? resource.status}
@@ -174,7 +174,7 @@ export default function ResourceDetailPage() {
             </CardHeader>
             <CardContent>
               {editing ? (
-                <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v })}>
+                  <Select value={form.type} onValueChange={(v) => v && setForm({ ...form, type: v })}>
                   <SelectTrigger className="bg-zinc-800 border-zinc-700 text-zinc-100">
                     <SelectValue />
                   </SelectTrigger>

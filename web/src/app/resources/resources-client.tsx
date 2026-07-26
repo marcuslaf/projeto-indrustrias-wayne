@@ -119,7 +119,7 @@ export function ResourcesClient({ resources: initialResources, userRole }: Resou
     })
 
     if (!parsed.success) {
-      const firstError = parsed.error.errors[0]?.message ?? 'Dados inválidos'
+      const firstError = parsed.error.issues[0]?.message ?? 'Dados inválidos'
       toast.error(firstError)
       setLoading(false)
       return
@@ -128,8 +128,8 @@ export function ResourcesClient({ resources: initialResources, userRole }: Resou
     const payload = parsed.data
 
     if (editingId) {
-      const { error } = await supabase
-        .from('resources')
+      const { error } = await (supabase
+        .from('resources') as any)
         .update(payload)
         .eq('id', editingId)
 
@@ -141,8 +141,8 @@ export function ResourcesClient({ resources: initialResources, userRole }: Resou
       toast.success('Recurso atualizado com sucesso!')
     } else {
       const { data: { user } } = await supabase.auth.getUser()
-      const { error } = await supabase
-        .from('resources')
+      const { error } = await (supabase
+        .from('resources') as any)
         .insert({ ...payload, created_by: user?.id ?? null })
 
       if (error) {
@@ -154,8 +154,8 @@ export function ResourcesClient({ resources: initialResources, userRole }: Resou
     }
 
     resetForm()
-    const { data } = await supabase.from('resources').select('*').is('deleted_at', null).order('created_at', { ascending: false })
-    if (data) setResources(data as unknown as Resource[])
+    const { data } = await (supabase.from('resources') as any).select('*').is('deleted_at', null).order('created_at', { ascending: false })
+    if (data) setResources(data as Resource[])
     setLoading(false)
   }
 
@@ -175,8 +175,8 @@ export function ResourcesClient({ resources: initialResources, userRole }: Resou
 
   async function handleDelete(id: number) {
     if (!confirm('Tem certeza que deseja excluir este recurso?')) return
-    const { error } = await supabase
-      .from('resources')
+    const { error } = await (supabase
+      .from('resources') as any)
       .update({ deleted_at: new Date().toISOString() })
       .eq('id', id)
 

@@ -33,7 +33,7 @@ interface LogItem {
   id: number; access_area: string; access_time: string; status: string
 }
 
-interface DashboardStats {
+export interface DashboardStats {
   totalResources: number
   equipmentInUse: number
   vehiclesInUse: number
@@ -165,7 +165,7 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Select value={period} onValueChange={setPeriod}>
+            <Select value={period} onValueChange={(v) => v && setPeriod(v)}>
               <SelectTrigger className="w-36 bg-zinc-900 border-zinc-800 text-zinc-300 text-sm h-9">
                 <SelectValue placeholder="Período" />
               </SelectTrigger>
@@ -265,7 +265,7 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
                     <AlertTriangle className="h-5 w-5 text-amber-500" />
                     Recursos em Manutenção
                   </CardTitle>
-                  <Select value={resourceFilter} onValueChange={setResourceFilter}>
+                  <Select value={resourceFilter} onValueChange={(v) => v && setResourceFilter(v)}>
                     <SelectTrigger className="w-44 bg-zinc-900 border-zinc-800 text-zinc-300 text-sm h-8">
                       <SelectValue placeholder="Filtrar tipo" />
                     </SelectTrigger>

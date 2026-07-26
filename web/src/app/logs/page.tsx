@@ -81,7 +81,7 @@ export default function LogsPage() {
           </div>
           <div className="flex items-center gap-2">
             <Filter className="h-4 w-4 text-zinc-500" />
-            <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(0) }}>
+            <Select value={statusFilter} onValueChange={(v) => { if (v) { setStatusFilter(v); setPage(0) } }}>
               <SelectTrigger className="w-36 bg-zinc-900 border-zinc-800 text-zinc-300">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
