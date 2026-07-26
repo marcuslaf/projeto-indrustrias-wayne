@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Navbar } from '@/components/navbar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -14,7 +14,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { createClient } from '@/lib/supabase-client'
-import { Search, Activity, ChevronLeft, ChevronRight, ShieldAlert, Filter, RefreshCw } from 'lucide-react'
+import { useConfirmDialog } from '@/components/confirm-dialog'
+import { Search, Activity, ChevronLeft, ChevronRight, ShieldAlert, Filter, RefreshCw, Trash2 } from 'lucide-react'
 
 const ITEMS_PER_PAGE = 15
 
@@ -27,6 +28,20 @@ export default function LogsPage() {
   const [statusFilter, setStatusFilter] = useState('all')
   const [page, setPage] = useState(0)
   const [refreshing, setRefreshing] = useState(false)
+  const [showClearMenu, setShowClearMenu] = useState(false)
+  const [clearing, setClearing] = useState(false)
+  const { confirm: confirmClear, dialog: clearDialog } = useConfirmDialog()
+  const clearMenuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (clearMenuRef.current && !clearMenuRef.current.contains(e.target as Node)) {
+        setShowClearMenu(false)
+      }
+    }
+    if (showClearMenu) document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showClearMenu])
 
   const loadLogs = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -46,6 +61,27 @@ export default function LogsPage() {
     const interval = setInterval(loadLogs, 30000)
     return () => clearInterval(interval)
   }, [loadLogs])
+
+  const handleClear = async (mode: 'all' | 'old') => {
+    const label = mode === 'all' ? 'TODOS os logs' : 'logs com mais de 90 dias'
+    const confirmed = await confirmClear({
+      title: 'Limpar Logs',
+      description: `Tem certeza que deseja excluir ${label}? Esta ação não pode ser desfeita.`,
+      confirmLabel: 'Limpar',
+      cancelLabel: 'Cancelar',
+      variant: 'destructive',
+    })
+    if (!confirmed) return
+
+    setClearing(true)
+    if (mode === 'old') {
+      await (supabase.rpc as any)('delete_old_logs', { days: 90 })
+    } else {
+      await supabase.from('access_logs').delete().neq('id', 0)
+    }
+    await loadLogs()
+    setClearing(false)
+  }
 
   const filtered = logs.filter((log) => {
     const matchSearch = !search || log.access_area.toLowerCase().includes(search.toLowerCase())
@@ -74,15 +110,47 @@ export default function LogsPage() {
             </h1>
             <p className="text-zinc-400 mt-1">Registro de todas as atividades e acessos ao sistema.</p>
           </div>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => { setRefreshing(true); loadLogs() }}
-            disabled={refreshing}
-            className="border-zinc-800 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 h-9 w-9"
-          >
-            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-          </Button>
+          <div className="flex gap-2">
+            {userRole === 'admin_seguranca' && (
+              <div className="relative" ref={clearMenuRef}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowClearMenu(!showClearMenu)}
+                  disabled={clearing}
+                  className="border-zinc-800 text-zinc-400 hover:text-red-400 hover:border-red-800/50"
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  {clearing ? 'Limpando...' : 'Limpar'}
+                </Button>
+                {showClearMenu && (
+                  <div className="absolute right-0 mt-2 w-56 rounded-lg border border-zinc-800 bg-zinc-900 py-1 shadow-xl z-50">
+                    <button
+                      className="w-full px-4 py-2 text-left text-sm text-zinc-300 hover:bg-zinc-800 transition-colors"
+                      onClick={() => { setShowClearMenu(false); handleClear('old') }}
+                    >
+                      Limpar logs &gt; 90 dias
+                    </button>
+                    <button
+                      className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-zinc-800 transition-colors"
+                      onClick={() => { setShowClearMenu(false); handleClear('all') }}
+                    >
+                      Limpar todos os logs
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => { setRefreshing(true); loadLogs() }}
+              disabled={refreshing}
+              className="border-zinc-800 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 h-9 w-9"
+            >
+              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            </Button>
+          </div>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
@@ -174,6 +242,7 @@ export default function LogsPage() {
           </div>
         )}
       </main>
+      {clearDialog}
     </div>
   )
 }
