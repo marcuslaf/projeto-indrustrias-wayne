@@ -29,7 +29,8 @@ import { Toaster } from '@/components/ui/sonner'
 import { createClient } from '@/lib/supabase-client'
 import { logAccess } from '@/lib/audit-log'
 import { useConfirmDialog } from '@/components/confirm-dialog'
-import { Search, Pencil, Trash2, Loader2, ExternalLink } from 'lucide-react'
+import { downloadCSV } from '@/lib/csv'
+import { Search, Pencil, Trash2, Loader2, ExternalLink, Download } from 'lucide-react'
 import { z } from 'zod'
 import type { Resource, ResourceType, ResourceStatus } from '@/db/schema'
 
@@ -253,11 +254,22 @@ export function ResourcesClient({ resources: initialResources, userRole, default
       </div>
       <Navbar userRole={userRole} />
       <main className="relative mx-auto max-w-7xl px-4 py-8 pt-20">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-zinc-100">Gestão de Recursos</h1>
-          <p className="text-zinc-400 mt-1">
-            Gerencie equipamentos, veículos e dispositivos de segurança.
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-8 gap-2">
+          <div>
+            <h1 className="text-2xl font-bold text-zinc-100">Gestão de Recursos</h1>
+            <p className="text-zinc-400 mt-1">
+              Gerencie equipamentos, veículos e dispositivos de segurança.
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => downloadCSV(resources as unknown as Record<string, unknown>[], 'recursos')}
+            className="border-zinc-800 text-zinc-400 hover:text-zinc-100"
+          >
+            <Download className="h-4 w-4 mr-1" />
+            Exportar CSV
+          </Button>
         </div>
 
         {canManage(userRole) && (

@@ -15,7 +15,8 @@ import {
 } from '@/components/ui/select'
 import { createClient } from '@/lib/supabase-client'
 import { useConfirmDialog } from '@/components/confirm-dialog'
-import { Search, Activity, ChevronLeft, ChevronRight, ShieldAlert, Filter, RefreshCw, Trash2 } from 'lucide-react'
+import { downloadCSV } from '@/lib/csv'
+import { Search, Activity, ChevronLeft, ChevronRight, ShieldAlert, Filter, RefreshCw, Trash2, Download } from 'lucide-react'
 
 const ITEMS_PER_PAGE = 15
 
@@ -111,6 +112,15 @@ export default function LogsPage() {
             <p className="text-zinc-400 mt-1">Registro de todas as atividades e acessos ao sistema.</p>
           </div>
           <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => downloadCSV(logs as unknown as Record<string, unknown>[], 'logs-acesso')}
+              className="border-zinc-800 text-zinc-400 hover:text-zinc-100"
+            >
+              <Download className="h-4 w-4 mr-1" />
+              CSV
+            </Button>
             {userRole === 'admin_seguranca' && (
               <div className="relative" ref={clearMenuRef}>
                 <Button
