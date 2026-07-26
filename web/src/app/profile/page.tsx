@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Toaster, toast } from 'sonner'
 import { createClient } from '@/lib/supabase-client'
+import { logAccess } from '@/lib/audit-log'
 import { User, Save, Loader2, KeyRound } from 'lucide-react'
 
 const roleLabel: Record<string, string> = {
@@ -51,6 +52,7 @@ export default function ProfilePage() {
     const { error } = await (supabase.from('profiles') as any).update({ nome: nome.trim() }).eq('id', user.id)
     if (error) { toast.error(error.message); setLoading(false); return }
     toast.success('Perfil atualizado com sucesso!')
+    logAccess('Perfil: Editar nome')
     setLoading(false)
   }
 
@@ -70,6 +72,7 @@ export default function ProfilePage() {
     if (error) { toast.error(error.message); setChangingPassword(false); return }
 
     toast.success('Senha alterada com sucesso!')
+    logAccess('Perfil: Alterar senha')
     setCurrentPassword('')
     setNewPassword('')
     setConfirmPassword('')

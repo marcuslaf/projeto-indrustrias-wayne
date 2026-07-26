@@ -28,6 +28,15 @@ export async function GET() {
         .from('resources')
         .insert({ ...seed, created_by: user.id } as any)
 
+      if (!error) {
+        await (supabase.from('access_logs') as any).insert({
+          access_area: `Recursos: Seed - ${seed.name}`,
+          access_time: new Date().toISOString(),
+          status: 'sucesso',
+          user_id: user.id,
+        })
+      }
+
       results.push({
         name: seed.name,
         status: error ? 'error' : 'created',

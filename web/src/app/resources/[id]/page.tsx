@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/select'
 import { Toaster, toast } from 'sonner'
 import { createClient } from '@/lib/supabase-client'
+import { logAccess } from '@/lib/audit-log'
 import {
   Package, ArrowLeft, Save, Loader2, Calendar, MapPin, Wrench, Barcode,
 } from 'lucide-react'
@@ -92,6 +93,7 @@ export default function ResourceDetailPage() {
     const { error } = await (supabase.from('resources') as any).update(payload).eq('id', id)
     if (error) { toast.error(error.message); setSaving(false); return }
     toast.success('Recurso atualizado!')
+    logAccess(`Recursos: Editar - ${form.name}`)
     setResource({ ...resource, ...payload })
     setEditing(false)
     setSaving(false)

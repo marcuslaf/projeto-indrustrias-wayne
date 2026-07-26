@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Navbar } from '@/components/navbar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -28,7 +28,7 @@ export default function LogsPage() {
   const [page, setPage] = useState(0)
   const [refreshing, setRefreshing] = useState(false)
 
-  async function loadLogs() {
+  const loadLogs = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (user) setUserRole(user.user_metadata?.role ?? 'funcionario')
     const { data } = await supabase
@@ -39,9 +39,13 @@ export default function LogsPage() {
     if (data) setLogs(data as any[])
     setLoading(false)
     setRefreshing(false)
-  }
+  }, [])
 
-  useEffect(() => { loadLogs() }, [])
+  useEffect(() => {
+    loadLogs()
+    const interval = setInterval(loadLogs, 30000)
+    return () => clearInterval(interval)
+  }, [loadLogs])
 
   const filtered = logs.filter((log) => {
     const matchSearch = !search || log.access_area.toLowerCase().includes(search.toLowerCase())

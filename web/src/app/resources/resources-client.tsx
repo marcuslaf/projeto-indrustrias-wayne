@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/table'
 import { Toaster, toast } from 'sonner'
 import { createClient } from '@/lib/supabase-client'
+import { logAccess } from '@/lib/audit-log'
 import { Search, Pencil, Trash2, Loader2, ExternalLink } from 'lucide-react'
 import { z } from 'zod'
 import type { Resource, ResourceType, ResourceStatus } from '@/db/schema'
@@ -139,6 +140,7 @@ export function ResourcesClient({ resources: initialResources, userRole }: Resou
         return
       }
       toast.success('Recurso atualizado com sucesso!')
+      logAccess(`Recursos: Editar - ${form.name}`)
     } else {
       const { data: { user } } = await supabase.auth.getUser()
       const { error } = await (supabase
@@ -151,6 +153,7 @@ export function ResourcesClient({ resources: initialResources, userRole }: Resou
         return
       }
       toast.success('Recurso criado com sucesso!')
+      logAccess(`Recursos: Criar - ${form.name}`)
     }
 
     resetForm()
@@ -175,6 +178,7 @@ export function ResourcesClient({ resources: initialResources, userRole }: Resou
 
   async function handleDelete(id: number) {
     if (!confirm('Tem certeza que deseja excluir este recurso?')) return
+    const resource = resources.find(r => r.id === id)
     const { error } = await (supabase
       .from('resources') as any)
       .update({ deleted_at: new Date().toISOString() })
@@ -185,6 +189,7 @@ export function ResourcesClient({ resources: initialResources, userRole }: Resou
       return
     }
     toast.success('Recurso excluído com sucesso!')
+    logAccess(`Recursos: Excluir - ${resource?.name ?? id}`)
     setResources((prev) => prev.filter((r) => r.id !== id))
   }
 
