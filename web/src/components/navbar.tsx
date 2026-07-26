@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase-client'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import {
-  LogOut, LayoutDashboard, Package, Users, User, ShieldAlert, Menu,
+  LogOut, LayoutDashboard, Package, Users, User, ShieldAlert, Menu, ClipboardList,
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -44,6 +44,7 @@ export function Navbar({ userRole }: NavbarProps) {
   const links = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/resources', label: 'Recursos', icon: Package },
+    { href: '/service-orders', label: 'Ordens', icon: ClipboardList },
     { href: '/logs', label: 'Logs', icon: ShieldAlert },
     { href: '/profile', label: 'Perfil', icon: User },
   ]

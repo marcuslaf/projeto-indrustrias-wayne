@@ -59,8 +59,15 @@ export default function LogsPage() {
 
   useEffect(() => {
     loadLogs()
-    const interval = setInterval(loadLogs, 30000)
-    return () => clearInterval(interval)
+    const channel = supabase
+      .channel('logs-realtime')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'access_logs' },
+        () => loadLogs(),
+      )
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
   }, [loadLogs])
 
   const handleClear = async (mode: 'all' | 'old') => {

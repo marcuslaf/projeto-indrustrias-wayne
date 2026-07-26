@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { Navbar } from '@/components/navbar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -20,9 +20,10 @@ import { Toaster } from '@/components/ui/sonner'
 import { createClient } from '@/lib/supabase-client'
 import { logAccess } from '@/lib/audit-log'
 import { useConfirmDialog } from '@/components/confirm-dialog'
+import QRCode from 'qrcode'
 import {
   Package, ArrowLeft, Save, Loader2, Calendar, MapPin, Wrench, Barcode,
-  Plus, History, DollarSign, User, Trash2,
+  Plus, History, DollarSign, User, Trash2, QrCode,
 } from 'lucide-react'
 
 const typeLabel: Record<string, string> = {
@@ -48,6 +49,37 @@ const statusOptions = [
   { value: 'em_uso', label: 'Em Uso' },
   { value: 'em_manutencao', label: 'Em Manutenção' },
 ]
+
+function QRCodeCard({ resourceId, resourceName }: { resourceId: number; resourceName: string }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  useEffect(() => {
+    if (!canvasRef.current || typeof window === 'undefined') return
+    const url = `${window.location.origin}/resources/${resourceId}`
+    QRCode.toCanvas(canvasRef.current, url, {
+      width: 140,
+      margin: 1,
+      color: { dark: '#a855f7', light: '#18181b' },
+    })
+  }, [resourceId])
+
+  return (
+    <Card className="bg-zinc-900/10 border-zinc-700/30 mt-6">
+      <CardHeader>
+        <CardTitle className="text-lg text-zinc-100 flex items-center gap-2">
+          <QrCode className="h-5 w-5 text-purple-500" />
+          QR Code
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="flex flex-col items-center gap-2">
+        <canvas ref={canvasRef} className="rounded-lg" />
+        <p className="text-xs text-zinc-500 text-center max-w-48">
+          Escaneie para acessar {resourceName}
+        </p>
+      </CardContent>
+    </Card>
+  )
+}
 
 export default function ResourceDetailPage() {
   const params = useParams()
@@ -461,6 +493,8 @@ export default function ResourceDetailPage() {
             )}
           </CardContent>
         </Card>
+
+        <QRCodeCard resourceId={id} resourceName={resource.name} />
       </main>
       <Toaster richColors />
       {confirmDialog}
