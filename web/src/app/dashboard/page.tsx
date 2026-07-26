@@ -18,7 +18,7 @@ export default async function DashboardPage() {
     .from('access_logs')
     .select('*')
     .order('access_time', { ascending: false })
-    .limit(10)
+    .limit(50)
 
   const res = (resources ?? []) as unknown as {
     id: number; name: string; type: string; status: string; location: string
@@ -32,6 +32,34 @@ export default async function DashboardPage() {
     access_time: string; status: string; ip_address: string | null
   }[]
 
+  const resourcesByType = ['equipamento', 'veiculo', 'dispositivo_seguranca']
+    .map(type => ({ name: type, value: res.filter(r => r.type === type).length }))
+    .filter(d => d.value > 0)
+
+  const resourcesByStatus = ['disponivel', 'em_uso', 'em_manutencao']
+    .map(status => ({ name: status, value: res.filter(r => r.status === status).length }))
+    .filter(d => d.value > 0)
+
+  const logsByDay = (() => {
+    const dayMap = new Map<string, { sucesso: number; falha: number }>()
+    const today = new Date()
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today)
+      d.setDate(d.getDate() - i)
+      const key = d.toLocaleDateString('pt-BR')
+      dayMap.set(key, { sucesso: 0, falha: 0 })
+    }
+    for (const log of logsArr) {
+      const d = new Date(log.access_time).toLocaleDateString('pt-BR')
+      if (dayMap.has(d)) {
+        const entry = dayMap.get(d)!
+        if (log.status === 'sucesso') entry.sucesso++
+        else entry.falha++
+      }
+    }
+    return Array.from(dayMap.entries()).map(([day, value]) => ({ day, ...value }))
+  })()
+
   const stats = {
     totalResources: res.length,
     equipmentInUse: res.filter(r => r.type === 'equipamento' && r.status === 'em_uso').length,
@@ -39,8 +67,11 @@ export default async function DashboardPage() {
     securityDevicesActive: res.filter(r => r.type === 'dispositivo_seguranca' && r.status === 'em_uso').length,
     available: res.filter(r => r.status === 'disponivel').length,
     inMaintenance: res.filter(r => r.status === 'em_manutencao').length,
-    recentLogs: logsArr,
+    recentLogs: logsArr.slice(0, 10),
     maintenanceResources: res.filter(r => r.status === 'em_manutencao'),
+    resourcesByType,
+    resourcesByStatus,
+    logsByDay,
   }
 
   return <DashboardClient profile={{ role: userRole, nome }} stats={stats} userRole={userRole} />
