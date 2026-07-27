@@ -38,7 +38,9 @@ export async function middleware(request: NextRequest) {
   }
 
   if (user && isPublicPath) {
-    const redirectTo = request.nextUrl.searchParams.get('redirectTo') || '/dashboard'
+    const rawRedirect = request.nextUrl.searchParams.get('redirectTo')
+    const allowedPaths = ['/dashboard', '/resources', '/service-orders', '/profile', '/logs', '/admin/users']
+    const redirectTo = rawRedirect && allowedPaths.includes(rawRedirect) ? rawRedirect : '/dashboard'
     const url = request.nextUrl.clone()
     url.pathname = redirectTo
     url.searchParams.delete('redirectTo')

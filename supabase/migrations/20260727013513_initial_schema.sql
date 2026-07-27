@@ -78,6 +78,10 @@ create table if not exists "public"."audit_logs" (
     constraint "audit_logs_pkey" primary key ("id")
 );
 
+-- Revoke default public access
+revoke all on schema public from public, anon;
+grant usage on schema public to anon, authenticated;
+
 alter table "public"."profiles" enable row level security;
 alter table "public"."resources" enable row level security;
 alter table "public"."service_orders" enable row level security;
@@ -85,7 +89,7 @@ alter table "public"."maintenance_history" enable row level security;
 alter table "public"."access_logs" enable row level security;
 alter table "public"."audit_logs" enable row level security;
 
-create policy "profiles_select_policy" on "public"."profiles" for select using (true);
+create policy "profiles_select_policy" on "public"."profiles" for select using (exists (select 1 from "public"."profiles" where id = auth.uid() and role in ('admin_seguranca', 'gerente')));
 create policy "profiles_insert_policy" on "public"."profiles" for insert with check (auth.uid() = id);
 create policy "profiles_update_policy" on "public"."profiles" for update using (auth.uid() = id) with check (auth.uid() = id);
 create policy "profiles_delete_policy" on "public"."profiles" for delete using (
@@ -93,7 +97,7 @@ create policy "profiles_delete_policy" on "public"."profiles" for delete using (
 );
 
 create policy "resources_select_policy" on "public"."resources" for select using (deleted_at is null);
-create policy "resources_insert_policy" on "public"."resources" for insert with check (auth.role() = 'authenticated');
+create policy "resources_insert_policy" on "public"."resources" for insert with check (exists (select 1 from "public"."profiles" where id = auth.uid() and role in ('admin_seguranca', 'gerente')));
 create policy "resources_update_policy" on "public"."resources" for update using (
     exists (select 1 from "public"."profiles" where id = auth.uid() and role in ('admin_seguranca', 'gerente'))
 );
@@ -101,8 +105,8 @@ create policy "resources_delete_policy" on "public"."resources" for delete using
     exists (select 1 from "public"."profiles" where id = auth.uid() and role = 'admin_seguranca')
 );
 
-create policy "service_orders_select_policy" on "public"."service_orders" for select using (true);
-create policy "service_orders_insert_policy" on "public"."service_orders" for insert with check (auth.role() = 'authenticated');
+create policy "service_orders_select_policy" on "public"."service_orders" for select using (exists (select 1 from "public"."profiles" where id = auth.uid() and role in ('admin_seguranca', 'gerente', 'funcionario')));
+create policy "service_orders_insert_policy" on "public"."service_orders" for insert with check (exists (select 1 from "public"."profiles" where id = auth.uid() and role in ('admin_seguranca', 'gerente', 'funcionario')));
 create policy "service_orders_update_policy" on "public"."service_orders" for update using (
     exists (select 1 from "public"."profiles" where id = auth.uid() and role in ('admin_seguranca', 'gerente'))
 );
@@ -111,14 +115,14 @@ create policy "service_orders_delete_policy" on "public"."service_orders" for de
 );
 
 create policy "maintenance_history_select_policy" on "public"."maintenance_history" for select using (true);
-create policy "maintenance_history_insert_policy" on "public"."maintenance_history" for insert with check (auth.role() = 'authenticated');
+create policy "maintenance_history_insert_policy" on "public"."maintenance_history" for insert with check (exists (select 1 from "public"."profiles" where id = auth.uid() and role in ('admin_seguranca', 'gerente')));
 create policy "maintenance_history_update_policy" on "public"."maintenance_history" for update using (false);
 create policy "maintenance_history_delete_policy" on "public"."maintenance_history" for delete using (
     exists (select 1 from "public"."profiles" where id = auth.uid() and role = 'admin_seguranca')
 );
 
-create policy "access_logs_select_policy" on "public"."access_logs" for select using (true);
-create policy "access_logs_insert_policy" on "public"."access_logs" for insert with check (auth.role() = 'authenticated');
+create policy "access_logs_select_policy" on "public"."access_logs" for select using (exists (select 1 from "public"."profiles" where id = auth.uid() and role in ('admin_seguranca', 'gerente')));
+create policy "access_logs_insert_policy" on "public"."access_logs" for insert with check (exists (select 1 from "public"."profiles" where id = auth.uid() and role in ('admin_seguranca', 'gerente', 'funcionario')));
 create policy "access_logs_delete_policy" on "public"."access_logs" for delete using (
     exists (select 1 from "public"."profiles" where id = auth.uid() and role = 'admin_seguranca')
 );
@@ -126,7 +130,7 @@ create policy "access_logs_delete_policy" on "public"."access_logs" for delete u
 create policy "audit_logs_select_policy" on "public"."audit_logs" for select using (
     exists (select 1 from "public"."profiles" where id = auth.uid() and role = 'admin_seguranca')
 );
-create policy "audit_logs_insert_policy" on "public"."audit_logs" for insert with check (auth.role() = 'authenticated');
+create policy "audit_logs_insert_policy" on "public"."audit_logs" for insert with check (exists (select 1 from "public"."profiles" where id = auth.uid() and role in ('admin_seguranca', 'gerente')));
 create policy "audit_logs_update_policy" on "public"."audit_logs" for update using (false);
 create policy "audit_logs_delete_policy" on "public"."audit_logs" for delete using (false);
 
@@ -153,7 +157,7 @@ begin
     values (
         new.id,
         coalesce(new.raw_user_meta_data ->> 'username', 'user_' || substr(new.id::text, 1, 8)),
-        coalesce(new.raw_user_meta_data ->> 'role', 'funcionario'),
+        'funcionario',
         coalesce(new.raw_user_meta_data ->> 'nome', 'Usuario'),
         new.email
     );

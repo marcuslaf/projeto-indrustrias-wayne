@@ -1,5 +1,6 @@
-export function downloadCSV(data: Record<string, unknown>[], filename: string) {
+export function downloadCSV(data: Record<string, unknown>[], filename: string, allowedRoles?: string[], userRole?: string) {
   if (data.length === 0) return
+  if (allowedRoles && userRole && !allowedRoles.includes(userRole)) return
 
   const headers = Object.keys(data[0])
   const csvContent = [

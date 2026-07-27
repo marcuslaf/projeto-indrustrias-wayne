@@ -184,7 +184,7 @@ export function ServiceOrdersClient({ orders: initialOrders, resources: initialR
             <Button
               variant="outline"
               size="sm"
-              onClick={() => downloadCSV(orders as unknown as Record<string, unknown>[], 'ordens-servico')}
+              onClick={() => downloadCSV(orders as unknown as Record<string, unknown>[], 'ordens-servico', ['admin_seguranca', 'gerente'], userRole)}
               className="border-zinc-800 text-zinc-400 hover:text-zinc-100"
             >
               <ExternalLink className="h-4 w-4 mr-1 rotate-90" />

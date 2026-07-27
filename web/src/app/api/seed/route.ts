@@ -10,8 +10,12 @@ export async function GET() {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
-    const role = user.user_metadata?.role as string
-    if (role !== 'admin_seguranca') {
+    const profile = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+    if (profile.error || profile.data?.role !== 'admin_seguranca') {
       return NextResponse.json({ error: 'Apenas admin_seguranca pode executar seed' }, { status: 403 })
     }
 
@@ -53,8 +57,8 @@ export async function GET() {
       message: 'Seed executado com sucesso!',
       results,
     })
-  } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 })
+  } catch {
+    return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }
 

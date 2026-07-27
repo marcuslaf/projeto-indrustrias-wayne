@@ -57,7 +57,9 @@ export default function LoginPage() {
       return
     }
 
-    const redirectTo = new URLSearchParams(window.location.search).get('redirectTo') || '/dashboard'
+    const rawRedirect = new URLSearchParams(window.location.search).get('redirectTo')
+    const allowedPaths = ['/dashboard', '/resources', '/service-orders', '/profile', '/logs', '/admin/users']
+    const redirectTo = rawRedirect && allowedPaths.includes(rawRedirect) ? rawRedirect : '/dashboard'
     toast.success('Login bem-sucedido!')
     router.push(redirectTo)
     router.refresh()

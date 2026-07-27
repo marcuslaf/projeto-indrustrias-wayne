@@ -46,7 +46,14 @@ export default function LogsPage() {
 
   const loadLogs = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
-    if (user) setUserRole(user.user_metadata?.role ?? 'funcionario')
+    if (user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+      setUserRole(profile?.role ?? 'funcionario')
+    }
     const { data } = await supabase
       .from('access_logs')
       .select('*')
@@ -116,7 +123,7 @@ export default function LogsPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => downloadCSV(logs as unknown as Record<string, unknown>[], 'logs-acesso')}
+              onClick={() => downloadCSV(logs as unknown as Record<string, unknown>[], 'logs-acesso', ['admin_seguranca', 'gerente'], userRole)}
               className="border-zinc-800 text-zinc-400 hover:text-zinc-100"
             >
               <Download className="h-4 w-4 mr-1" />

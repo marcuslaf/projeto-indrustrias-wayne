@@ -5,7 +5,15 @@ export default async function ServiceOrdersPage() {
   const supabase = await createServerSupabaseClient()
 
   const { data: { user } } = await supabase.auth.getUser()
-  const userRole = (user?.user_metadata?.role as string) ?? 'funcionario'
+  let userRole = 'funcionario'
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+    if (profile) userRole = profile.role
+  }
 
   return (
     <ServiceOrdersClient

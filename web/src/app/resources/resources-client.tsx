@@ -276,7 +276,7 @@ export function ResourcesClient({ resources: initialResources, userRole, default
           <Button
             variant="outline"
             size="sm"
-            onClick={() => downloadCSV(resources as unknown as Record<string, unknown>[], 'recursos')}
+            onClick={() => downloadCSV(resources as unknown as Record<string, unknown>[], 'recursos', ['admin_seguranca', 'gerente'], userRole)}
             className="border-zinc-800 text-zinc-400 hover:text-zinc-100"
           >
             <Download className="h-4 w-4 mr-1" />
