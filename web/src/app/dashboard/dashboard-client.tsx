@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Navbar } from '@/components/navbar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -19,6 +19,8 @@ import {
   Tooltip, Legend, ResponsiveContainer,
 } from 'recharts'
 
+import { createClient } from '@/lib/supabase-client'
+import { PageSkeleton } from '@/components/page-skeleton'
 import {
   Package, Wrench, ShieldCheck, Truck, AlertTriangle, Activity,
   RefreshCw, ExternalLink,
@@ -52,7 +54,6 @@ export interface DashboardStats {
 
 interface DashboardClientProps {
   profile: { role: string; nome: string } | null
-  stats: DashboardStats
   userRole: string
 }
 
@@ -82,11 +83,84 @@ const statusColor: Record<string, string> = {
   em_manutencao: '#ef4444',
 }
 
-export function DashboardClient({ profile, stats, userRole }: DashboardClientProps) {
+export function DashboardClient({ profile, userRole }: DashboardClientProps) {
   const router = useRouter()
+  const [stats, setStats] = useState<DashboardStats | null>(null)
   const [period, setPeriod] = useState('7')
   const [resourceFilter, setResourceFilter] = useState('all')
   const [chartTip, setChartTip] = useState<{ payload: { name: string; value: number; color: string; dataKey: string }[]; label: string; x: number; y: number } | null>(null)
+
+  useEffect(() => {
+    const supabase = createClient()
+    async function loadData() {
+      const { data: resources } = await supabase
+        .from('resources')
+        .select('*')
+        .is('deleted_at', null)
+
+      const { data: logs } = await supabase
+        .from('access_logs')
+        .select('*')
+        .order('access_time', { ascending: false })
+        .limit(50)
+
+      const res = (resources ?? []) as unknown as {
+        id: number; name: string; type: string; status: string; location: string
+        serial_number: string | null; plate: string | null
+        acquisition_date: string; last_maintenance_date: string | null
+        created_by: string | null; created_at: string; updated_at: string; deleted_at: string | null
+      }[]
+
+      const logsArr = (logs ?? []) as unknown as {
+        id: number; user_id: string | null; access_area: string
+        access_time: string; status: string; ip_address: string | null
+      }[]
+
+      const oneYearAgo = new Date()
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1)
+
+      const overdueMaintenance = res.filter((r) => {
+        const refDate = r.last_maintenance_date ? new Date(r.last_maintenance_date) : new Date(r.acquisition_date)
+        return refDate < oneYearAgo
+      })
+
+      const resourcesByType = ['equipamento', 'veiculo', 'dispositivo_seguranca']
+        .map(type => ({ name: type, value: res.filter(r => r.type === type).length }))
+        .filter(d => d.value > 0)
+
+      const resourcesByStatus = ['disponivel', 'em_uso', 'em_manutencao']
+        .map(status => ({ name: status, value: res.filter(r => r.status === status).length }))
+        .filter(d => d.value > 0)
+
+      setStats({
+        totalResources: res.length,
+        equipmentInUse: res.filter(r => r.type === 'equipamento' && r.status === 'em_uso').length,
+        vehiclesInUse: res.filter(r => r.type === 'veiculo' && r.status === 'em_uso').length,
+        securityDevicesActive: res.filter(r => r.type === 'dispositivo_seguranca' && r.status === 'em_uso').length,
+        available: res.filter(r => r.status === 'disponivel').length,
+        inMaintenance: res.filter(r => r.status === 'em_manutencao').length,
+        recentLogs: logsArr.slice(0, 10),
+        allLogs: logsArr,
+        maintenanceResources: res.filter(r => r.status === 'em_manutencao'),
+        overdueMaintenance: overdueMaintenance.map((r) => ({ id: r.id, name: r.name })),
+        resourcesByType,
+        resourcesByStatus,
+        logsByDay: [],
+      })
+    }
+    loadData()
+  }, [])
+
+  if (!stats) {
+    return (
+      <div className="relative min-h-screen bg-zinc-950">
+        <Navbar userRole={userRole} />
+        <main className="relative mx-auto max-w-7xl px-4 py-8 pt-20">
+          <PageSkeleton />
+        </main>
+      </div>
+    )
+  }
 
   const periodDays = Number(period)
 

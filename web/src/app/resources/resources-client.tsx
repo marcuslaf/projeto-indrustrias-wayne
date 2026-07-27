@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Navbar } from '@/components/navbar'
@@ -29,6 +29,7 @@ import { Toaster } from '@/components/ui/sonner'
 import { createClient } from '@/lib/supabase-client'
 import { logAccess } from '@/lib/audit-log'
 import { useConfirmDialog } from '@/components/confirm-dialog'
+import { PageSkeleton } from '@/components/page-skeleton'
 import { downloadCSV } from '@/lib/csv'
 import { Search, Pencil, Trash2, Loader2, ExternalLink, Download } from 'lucide-react'
 import { z } from 'zod'
@@ -83,12 +84,23 @@ export function ResourcesClient({ resources: initialResources, userRole, default
   const router = useRouter()
   const supabase = createClient()
   const [resources, setResources] = useState<Resource[]>(initialResources)
+  const [pageLoading, setPageLoading] = useState(initialResources.length === 0)
   const [search, setSearch] = useState('')
   const [filterType, setFilterType] = useState<string>(defaultType ?? 'all')
   const [filterStatus, setFilterStatus] = useState<string>(defaultStatus ?? 'all')
   const [editingId, setEditingId] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
   const { confirm: confirmDelete, dialog: confirmDialog } = useConfirmDialog()
+
+  useEffect(() => {
+    if (initialResources.length === 0) {
+      supabase.from('resources').select('*').is('deleted_at', null).order('created_at', { ascending: false })
+        .then(({ data }) => {
+          if (data) setResources(data as Resource[])
+          setPageLoading(false)
+        })
+    }
+  }, [])
 
   const [form, setForm] = useState({
     name: '',
@@ -231,6 +243,17 @@ export function ResourcesClient({ resources: initialResources, userRole, default
     toast.success('Recurso excluído com sucesso!')
     logAccess(`Recursos: Excluir - ${resource?.name ?? id}`)
     setResources((prev) => prev.filter((r) => r.id !== id))
+  }
+
+  if (pageLoading) {
+    return (
+      <div className="relative min-h-screen bg-zinc-950">
+        <Navbar userRole={userRole} />
+        <main className="relative mx-auto max-w-7xl px-4 py-8 pt-20">
+          <PageSkeleton />
+        </main>
+      </div>
+    )
   }
 
   return (

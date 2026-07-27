@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Navbar } from '@/components/navbar'
 import { Button } from '@/components/ui/button'
@@ -27,6 +27,7 @@ import { toast } from 'sonner'
 import { Toaster } from '@/components/ui/sonner'
 import { createClient } from '@/lib/supabase-client'
 import { useConfirmDialog } from '@/components/confirm-dialog'
+import { PageSkeleton } from '@/components/page-skeleton'
 import { Trash2, UserPlus, Loader2 } from 'lucide-react'
 
 interface ProfileItem {
@@ -52,9 +53,20 @@ export function AdminUsersClient({ profiles: initialProfiles, userRole }: AdminU
   const router = useRouter()
   const supabase = createClient()
   const [profiles, setProfiles] = useState<ProfileItem[]>(initialProfiles)
+  const [pageLoading, setPageLoading] = useState(initialProfiles.length === 0)
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({ username: '', password: '', nome: '', email: '', role: '' })
   const { confirm: confirmDelete, dialog: confirmDialog } = useConfirmDialog()
+
+  useEffect(() => {
+    if (initialProfiles.length === 0) {
+      supabase.from('profiles').select('*').order('created_at', { ascending: false })
+        .then(({ data }) => {
+          if (data) setProfiles(data as ProfileItem[])
+          setPageLoading(false)
+        })
+    }
+  }, [])
 
   if (userRole !== 'admin_seguranca') {
     return (
@@ -133,6 +145,17 @@ export function AdminUsersClient({ profiles: initialProfiles, userRole }: AdminU
     }
     toast.success('Usuário excluído!')
     setProfiles((prev) => prev.filter((p) => p.id !== id))
+  }
+
+  if (pageLoading) {
+    return (
+      <div className="relative min-h-screen bg-zinc-950">
+        <Navbar userRole={userRole} />
+        <main className="relative mx-auto max-w-7xl px-4 py-8 pt-20">
+          <PageSkeleton />
+        </main>
+      </div>
+    )
   }
 
   return (

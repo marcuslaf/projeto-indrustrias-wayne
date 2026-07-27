@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Navbar } from '@/components/navbar'
 import { Button } from '@/components/ui/button'
@@ -28,6 +28,7 @@ import { Toaster } from '@/components/ui/sonner'
 import { createClient } from '@/lib/supabase-client'
 import { logAccess } from '@/lib/audit-log'
 import { useConfirmDialog } from '@/components/confirm-dialog'
+import { PageSkeleton } from '@/components/page-skeleton'
 import {
   ClipboardList, Plus, Loader2, Trash2, Search, ExternalLink,
 } from 'lucide-react'
@@ -63,15 +64,36 @@ interface Props {
   userRole: string
 }
 
-export function ServiceOrdersClient({ orders: initialOrders, resources, profiles, userRole }: Props) {
+export function ServiceOrdersClient({ orders: initialOrders, resources: initialResources, profiles: initialProfiles, userRole }: Props) {
   const router = useRouter()
   const supabase = createClient()
   const [orders, setOrders] = useState<ServiceOrder[]>(initialOrders)
+  const [resources, setResources] = useState<{ id: number; name: string }[]>(initialResources)
+  const [profiles, setProfiles] = useState<{ id: string; username: string; nome: string }[]>(initialProfiles)
+  const [pageLoading, setPageLoading] = useState(initialOrders.length === 0)
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
   const { confirm: confirmDelete, dialog: confirmDialog } = useConfirmDialog()
+
+  useEffect(() => {
+    async function loadData() {
+      const [ordersRes, resourcesRes, profilesRes] = await Promise.all([
+        (supabase as any)
+          .from('service_orders')
+          .select('*, resource:resources(id, name), assignee:profiles!assigned_to(id, username, nome)')
+          .order('created_at', { ascending: false }),
+        supabase.from('resources').select('id, name').is('deleted_at', null).order('name'),
+        supabase.from('profiles').select('id, username, nome').order('nome'),
+      ])
+      if (ordersRes.data) setOrders(ordersRes.data)
+      if (resourcesRes.data) setResources(resourcesRes.data)
+      if (profilesRes.data) setProfiles(profilesRes.data)
+      setPageLoading(false)
+    }
+    if (initialOrders.length === 0) loadData()
+  }, [])
 
   const [form, setForm] = useState({
     title: '', description: '', resource_id: '', assigned_to: '', priority: 'media',
@@ -133,6 +155,17 @@ export function ServiceOrdersClient({ orders: initialOrders, resources, profiles
       .select('*, resource:resources(id, name), assignee:profiles!assigned_to(id, username, nome)')
       .order('created_at', { ascending: false })
     if (data) setOrders(data)
+  }
+
+  if (pageLoading) {
+    return (
+      <div className="relative min-h-screen bg-zinc-950">
+        <Navbar userRole={userRole} />
+        <main className="relative mx-auto max-w-5xl px-4 py-8 pt-20">
+          <PageSkeleton />
+        </main>
+      </div>
+    )
   }
 
   return (
