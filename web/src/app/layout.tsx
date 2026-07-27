@@ -16,7 +16,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt-BR" className="dark">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-zinc-950 text-zinc-100`}>
         <GothamBackground />
-        {children}
+        <div className="relative bg-zinc-950 min-h-screen">
+          {children}
+        </div>
       </body>
     </html>
   )
