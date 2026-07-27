@@ -429,13 +429,16 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
                       <BarChart
                         data={stats.resourcesByStatus}
                         onMouseMove={(state: any) => {
-                          if (state.isTooltipActive && state.activePayload?.length) {
-                            setChartTip({
-                              payload: state.activePayload.map((p: any) => ({ name: p.name, value: p.value, color: p.color })),
-                              label: state.activeLabel,
-                              x: state.activeCoordinate?.x ?? 0,
-                              y: state.activeCoordinate?.y ?? 0,
-                            })
+                          if (state.isTooltipActive && state.activeIndex != null) {
+                            const item = stats.resourcesByStatus[state.activeIndex]
+                            if (item) {
+                              setChartTip({
+                                payload: [{ name: 'Recursos', value: item.value, color: statusColor[item.name] ?? '#fff', dataKey: 'value' }],
+                                label: item.name,
+                                x: state.activeCoordinate?.x ?? 0,
+                                y: state.activeCoordinate?.y ?? 0,
+                              })
+                            }
                           }
                         }}
                         onMouseLeave={() => setChartTip(null)}
