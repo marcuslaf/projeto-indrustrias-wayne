@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Navbar } from '@/components/navbar'
@@ -90,6 +90,7 @@ export function ResourcesClient({ resources: initialResources, userRole, default
   const [filterStatus, setFilterStatus] = useState<string>(defaultStatus ?? 'all')
   const [editingId, setEditingId] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
+  const formRef = useRef<HTMLDivElement>(null)
   const { confirm: confirmDelete, dialog: confirmDialog } = useConfirmDialog()
 
   useEffect(() => {
@@ -219,6 +220,7 @@ export function ResourcesClient({ resources: initialResources, userRole, default
       acquisition_date: resource.acquisition_date,
       last_maintenance_date: resource.last_maintenance_date ?? '',
     })
+    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   async function handleDelete(id: number) {
@@ -279,7 +281,7 @@ export function ResourcesClient({ resources: initialResources, userRole, default
         </div>
 
         {canManage(userRole) && (
-          <Card className="mb-8 bg-zinc-900/10 border-zinc-700/30">
+          <Card ref={formRef} className="mb-8 bg-zinc-900/10 border-zinc-700/30">
             <CardHeader>
               <CardTitle className="text-lg text-zinc-100">
                 {editingId ? 'Editar Recurso' : 'Adicionar Recurso'}
