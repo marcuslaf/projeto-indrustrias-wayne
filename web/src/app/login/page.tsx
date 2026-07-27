@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase-client'
+import { GothamBackground } from '@/components/gotham-background'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -64,6 +65,7 @@ export default function LoginPage() {
 
   return (
     <div className="relative min-h-screen bg-zinc-950 flex items-center justify-center p-4 overflow-hidden">
+      <GothamBackground />
       <div
         className="absolute inset-0 opacity-[0.03]"
         style={{
