@@ -86,6 +86,7 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
   const router = useRouter()
   const [period, setPeriod] = useState('7')
   const [resourceFilter, setResourceFilter] = useState('all')
+  const [chartTip, setChartTip] = useState<{ payload: { name: string; value: number; color: string; dataKey: string }[]; label: string; x: number; y: number } | null>(null)
 
   const periodDays = Number(period)
 
@@ -423,9 +424,22 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
                   <CardTitle className="text-lg text-zinc-100">Recursos por Status</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-72">
+                  <div className="h-72 relative">
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={stats.resourcesByStatus}>
+                      <BarChart
+                        data={stats.resourcesByStatus}
+                        onMouseMove={(state: any) => {
+                          if (state.isTooltipActive && state.activePayload?.length) {
+                            setChartTip({
+                              payload: state.activePayload.map((p: any) => ({ name: p.name, value: p.value, color: p.color })),
+                              label: state.activeLabel,
+                              x: state.activeCoordinate?.x ?? 0,
+                              y: state.activeCoordinate?.y ?? 0,
+                            })
+                          }
+                        }}
+                        onMouseLeave={() => setChartTip(null)}
+                      >
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                         <XAxis
                           dataKey="name"
@@ -438,7 +452,6 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
                           axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
                           allowDecimals={false}
                         />
-                        <Tooltip content={<CustomTooltip />} wrapperStyle={{ background: 'transparent', backgroundColor: 'transparent', border: 'none', boxShadow: 'none', outline: 'none' }} isAnimationActive={false} />
                         <Bar dataKey="value" name="Recursos" radius={[4, 4, 0, 0]}>
                           {stats.resourcesByStatus.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={statusColor[entry.name] ?? CHART_COLORS[index % CHART_COLORS.length]} />
@@ -446,6 +459,33 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
                         </Bar>
                       </BarChart>
                     </ResponsiveContainer>
+                    {chartTip && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          left: chartTip.x,
+                          top: chartTip.y - 10,
+                          transform: 'translate(-50%, -100%)',
+                          backgroundColor: '#18181b',
+                          border: '1px solid #3f3f46',
+                          borderRadius: '0.5rem',
+                          padding: '0.5rem 0.75rem',
+                          boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)',
+                          zIndex: 50,
+                          pointerEvents: 'none',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        <p style={{ fontWeight: 500, marginBottom: '0.25rem', color: '#d4d4d8' }}>
+                          {statusLabel[chartTip.label] ?? chartTip.label}
+                        </p>
+                        {chartTip.payload.map((entry, i) => (
+                          <p key={i} style={{ fontWeight: 600, color: entry.color }}>
+                            {entry.name}: {entry.value}
+                          </p>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
