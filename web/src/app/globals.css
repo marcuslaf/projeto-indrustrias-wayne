@@ -139,3 +139,19 @@
 .recharts-tooltip-wrapper > * {
   background: #18181b !important;
 }
+
+.recharts-surface {
+  background: transparent !important;
+}
+
+.recharts-wrapper {
+  background: transparent !important;
+}
+
+.recharts-legend-item:hover {
+  opacity: 1 !important;
+}
+
+.recharts-default-legend {
+  background: transparent !important;
+}
