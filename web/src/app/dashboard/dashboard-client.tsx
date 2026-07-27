@@ -156,8 +156,8 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload?.length) {
       return (
-        <div className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm shadow-xl">
-          <p className="text-zinc-300 font-medium mb-1">{payload[0].name || label}</p>
+        <div className="border rounded-lg px-3 py-2 text-sm" style={{ backgroundColor: '#18181b', borderColor: '#3f3f46', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
+          <p className="font-medium mb-1" style={{ color: '#d4d4d8' }}>{payload[0].name || label}</p>
           {payload.map((entry: any, i: number) => (
             <p key={i} style={{ color: entry.color }} className="font-semibold">
               {entry.name}: {entry.value}
@@ -407,7 +407,7 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
                             <Cell key={`cell-${index}`} fill={typeColor[entry.name] ?? CHART_COLORS[index % CHART_COLORS.length]} />
                           ))}
                         </Pie>
-                        <Tooltip content={<CustomTooltip />} wrapperStyle={{ background: 'transparent', border: 'none', boxShadow: 'none' }} />
+                        <Tooltip content={<CustomTooltip />} wrapperStyle={{ background: 'transparent', backgroundColor: 'transparent', border: 'none', boxShadow: 'none', outline: 'none' }} />
                         <Legend
                           formatter={(value: string) => <span className="text-zinc-400 text-sm">{typeLabel[value] ?? value}</span>}
                         />
@@ -437,7 +437,7 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
                           axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
                           allowDecimals={false}
                         />
-                        <Tooltip content={<CustomTooltip />} wrapperStyle={{ background: 'transparent', border: 'none', boxShadow: 'none' }} />
+                        <Tooltip content={<CustomTooltip />} wrapperStyle={{ background: 'transparent', backgroundColor: 'transparent', border: 'none', boxShadow: 'none', outline: 'none' }} />
                         <Bar dataKey="value" name="Recursos" radius={[4, 4, 0, 0]}>
                           {stats.resourcesByStatus.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={statusColor[entry.name] ?? CHART_COLORS[index % CHART_COLORS.length]} />
@@ -469,7 +469,7 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
                             axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
                             allowDecimals={false}
                           />
-                          <Tooltip content={<CustomTooltip />} wrapperStyle={{ background: 'transparent', border: 'none', boxShadow: 'none' }} />
+                          <Tooltip content={<CustomTooltip />} wrapperStyle={{ background: 'transparent', backgroundColor: 'transparent', border: 'none', boxShadow: 'none', outline: 'none' }} />
                           <Legend
                             formatter={(value: string) => <span className="text-zinc-400 text-sm">{value === 'sucesso' ? 'Sucesso' : 'Falha'}</span>}
                           />
