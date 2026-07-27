@@ -33,12 +33,15 @@ export async function middleware(request: NextRequest) {
   if (!user && !isPublicPath) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
+    url.searchParams.set('redirectTo', request.nextUrl.pathname)
     return NextResponse.redirect(url)
   }
 
   if (user && isPublicPath) {
+    const redirectTo = request.nextUrl.searchParams.get('redirectTo') || '/dashboard'
     const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
+    url.pathname = redirectTo
+    url.searchParams.delete('redirectTo')
     return NextResponse.redirect(url)
   }
 

@@ -1,0 +1,152 @@
+- generic [active] [ref=f1e1]:
+  - generic [ref=f1e2]:
+    - generic:
+      - img:
+        - generic: INDÚSTRIAS WAYNE
+    - banner [ref=f1e3]:
+      - generic [ref=f1e4]:
+        - generic [ref=f1e5]:
+          - link "Indústrias Wayne" [ref=f1e6] [cursor=pointer]:
+            - /url: /dashboard
+          - navigation [ref=f1e11]:
+            - link "Dashboard" [ref=f1e12] [cursor=pointer]:
+              - /url: /dashboard
+            - link "Recursos" [ref=f1e18] [cursor=pointer]:
+              - /url: /resources
+            - link "Ordens" [ref=f1e23] [cursor=pointer]:
+              - /url: /service-orders
+            - link "Logs" [ref=f1e27] [cursor=pointer]:
+              - /url: /logs
+            - link "Perfil" [ref=f1e30] [cursor=pointer]:
+              - /url: /profile
+            - link "Usuários" [ref=f1e34] [cursor=pointer]:
+              - /url: /admin/users
+        - button "Sair" [ref=f1e41]
+    - main [ref=f1e42]:
+      - generic [ref=f1e43]:
+        - generic [ref=f1e44]:
+          - heading "Gestão de Recursos" [level=1] [ref=f1e45]
+          - paragraph [ref=f1e46]: Gerencie equipamentos, veículos e dispositivos de segurança.
+        - button "Exportar CSV" [ref=f1e47]
+      - generic [ref=f1e48]:
+        - generic [ref=f1e49]: Adicionar Recurso
+        - generic [ref=f1e52]:
+          - generic [ref=f1e53]:
+            - generic [ref=f1e54]: Nome
+            - textbox "Nome" [ref=f1e55]
+          - generic [ref=f1e56]:
+            - generic [ref=f1e57]: Tipo
+            - combobox [ref=f1e58]:
+              - generic [ref=f1e59]: Selecione
+              - img: ▼
+            - textbox [ref=f1e60]
+          - generic [ref=f1e61]:
+            - generic [ref=f1e62]: Localização
+            - textbox "Localização" [ref=f1e63]
+          - generic [ref=f1e64]:
+            - generic [ref=f1e65]: Status
+            - combobox [ref=f1e66]:
+              - generic [ref=f1e67]: Selecione
+              - img: ▼
+            - textbox [ref=f1e68]
+          - generic [ref=f1e69]:
+            - generic [ref=f1e70]: Nº Série (opcional)
+            - textbox "Nº Série (opcional)" [ref=f1e71]
+          - generic [ref=f1e72]:
+            - generic [ref=f1e73]: Placa (opcional)
+            - textbox "Placa (opcional)" [ref=f1e74]
+          - generic [ref=f1e75]:
+            - generic [ref=f1e76]: Data de Aquisição
+            - textbox "Data de Aquisição" [ref=f1e77]
+          - generic [ref=f1e78]:
+            - generic [ref=f1e79]: Última Manutenção
+            - textbox "Última Manutenção" [ref=f1e80]
+          - button "Adicionar Recurso" [ref=f1e82]
+      - textbox "Buscar recursos..." [ref=f1e88]
+      - generic [ref=f1e89]:
+        - button "Todos 5" [ref=f1e90]:
+          - generic [ref=f1e91]: Todos
+          - generic [ref=f1e92]: "5"
+        - button "Equip. em Uso 1" [ref=f1e93]:
+          - generic [ref=f1e94]: Equip. em Uso
+          - generic [ref=f1e95]: "1"
+        - button "Veículos em Operação 0" [ref=f1e96]:
+          - generic [ref=f1e97]: Veículos em Operação
+          - generic [ref=f1e98]: "0"
+        - button "Disp. Segurança 0" [ref=f1e99]:
+          - generic [ref=f1e100]: Disp. Segurança
+          - generic [ref=f1e101]: "0"
+        - button "Em Manutenção 1" [ref=f1e102]:
+          - generic [ref=f1e103]: Em Manutenção
+          - generic [ref=f1e104]: "1"
+      - table [ref=f1e108]:
+        - rowgroup [ref=f1e109]:
+          - row [ref=f1e110]:
+            - columnheader "Nome" [ref=f1e111]
+            - columnheader "Tipo" [ref=f1e112]
+            - columnheader "Status" [ref=f1e113]
+            - columnheader "Localização" [ref=f1e114]
+            - columnheader "Ações" [ref=f1e115]
+        - rowgroup [ref=f1e116]:
+          - row [ref=f1e117]:
+            - cell [ref=f1e118]:
+              - link "Notebook" [ref=f1e119] [cursor=pointer]:
+                - /url: /resources/5
+            - cell "Equipamento" [ref=f1e124]
+            - cell "Disponível" [ref=f1e125]
+            - cell "Batcaverna" [ref=f1e127]
+            - cell [ref=f1e128]:
+              - generic [ref=f1e129]:
+                - button "Ver detalhes" [ref=f1e130]
+                - button "Editar" [ref=f1e131]
+                - button "Excluir" [ref=f1e132]
+          - row [ref=f1e133]:
+            - cell [ref=f1e134]:
+              - link "Bat-computador principal" [ref=f1e135] [cursor=pointer]:
+                - /url: /resources/1
+            - cell "Equipamento" [ref=f1e140]
+            - cell "Em Uso" [ref=f1e141]
+            - cell "Batcaverna" [ref=f1e143]
+            - cell [ref=f1e144]:
+              - generic [ref=f1e145]:
+                - button "Ver detalhes" [ref=f1e146]
+                - button "Editar" [ref=f1e147]
+                - button "Excluir" [ref=f1e148]
+          - row [ref=f1e149]:
+            - cell [ref=f1e150]:
+              - link "Batmovel MK-III" [ref=f1e151] [cursor=pointer]:
+                - /url: /resources/2
+            - cell "Veículo" [ref=f1e156]
+            - cell "Disponível" [ref=f1e157]
+            - cell "Batcaverna" [ref=f1e159]
+            - cell [ref=f1e160]:
+              - generic [ref=f1e161]:
+                - button "Ver detalhes" [ref=f1e162]
+                - button "Editar" [ref=f1e163]
+                - button "Excluir" [ref=f1e164]
+          - row [ref=f1e165]:
+            - cell [ref=f1e166]:
+              - link "Câmera de Vigilância T-2000" [ref=f1e167] [cursor=pointer]:
+                - /url: /resources/3
+            - cell "Disp. Segurança" [ref=f1e172]
+            - cell "Disponível" [ref=f1e173]
+            - cell "Entrada Principal" [ref=f1e175]
+            - cell [ref=f1e176]:
+              - generic [ref=f1e177]:
+                - button "Ver detalhes" [ref=f1e178]
+                - button "Editar" [ref=f1e179]
+                - button "Excluir" [ref=f1e180]
+          - row [ref=f1e181]:
+            - cell [ref=f1e182]:
+              - link "Drone de Reconhecimento G-Series" [ref=f1e183] [cursor=pointer]:
+                - /url: /resources/4
+            - cell "Equipamento" [ref=f1e188]
+            - cell "Em Manutenção" [ref=f1e189]
+            - cell "Hangar B" [ref=f1e191]
+            - cell [ref=f1e192]:
+              - generic [ref=f1e193]:
+                - button "Ver detalhes" [ref=f1e194]
+                - button "Editar" [ref=f1e195]
+                - button "Excluir" [ref=f1e196]
+    - region "Notifications alt+T"
+  - alert [ref=f1e197]

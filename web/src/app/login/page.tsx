@@ -56,8 +56,9 @@ export default function LoginPage() {
       return
     }
 
+    const redirectTo = new URLSearchParams(window.location.search).get('redirectTo') || '/dashboard'
     toast.success('Login bem-sucedido!')
-    router.push('/dashboard')
+    router.push(redirectTo)
     router.refresh()
   }
 
