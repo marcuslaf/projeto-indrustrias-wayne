@@ -1,7 +1,19 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { DashboardClient } from './dashboard-client'
-import type { DashboardStats } from './dashboard-client'
+
+const mockState = vi.hoisted(() => ({
+  logData: [
+    { id: 1, access_area: 'Sala de Controle', access_time: '2026-07-26T10:00:00Z', status: 'sucesso', user_id: null, ip_address: null },
+  ],
+}))
+
+const mockResourceData = [
+  { id: 1, name: 'Servidor', type: 'equipamento', status: 'em_uso', location: 'Sala A', serial_number: null, plate: null, acquisition_date: '2025-01-01', last_maintenance_date: null, created_by: null, created_at: '2025-01-01', updated_at: '2025-01-01', deleted_at: null },
+  { id: 2, name: 'Batmovel', type: 'veiculo', status: 'em_uso', location: 'Garagem', serial_number: null, plate: 'BAT-001', acquisition_date: '2025-01-01', last_maintenance_date: null, created_by: null, created_at: '2025-01-01', updated_at: '2025-01-01', deleted_at: null },
+  { id: 3, name: 'Drone', type: 'dispositivo_seguranca', status: 'em_manutencao', location: 'Hangar', serial_number: null, plate: null, acquisition_date: '2025-01-01', last_maintenance_date: '2026-06-01', created_by: null, created_at: '2025-01-01', updated_at: '2025-01-01', deleted_at: null },
+  { id: 4, name: 'Monitor', type: 'equipamento', status: 'disponivel', location: 'Sala B', serial_number: null, plate: null, acquisition_date: '2025-01-01', last_maintenance_date: null, created_by: null, created_at: '2025-01-01', updated_at: '2025-01-01', deleted_at: null },
+]
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
@@ -10,7 +22,25 @@ vi.mock('next/navigation', () => ({
 }))
 
 vi.mock('@/lib/supabase-client', () => ({
-  createClient: () => ({}),
+  createClient: () => ({
+    from: vi.fn().mockImplementation((table: string) => {
+      if (table === 'resources') {
+        const chain: any = {
+          select: vi.fn().mockReturnThis(),
+          is: vi.fn().mockResolvedValue({ data: mockResourceData, error: null }),
+        }
+        return chain
+      }
+      const chain: any = {
+        select: vi.fn().mockReturnThis(),
+        order: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockImplementation(() =>
+          Promise.resolve({ data: mockState.logData, error: null }),
+        ),
+      }
+      return chain
+    }),
+  }),
 }))
 
 vi.mock('@/components/navbar', () => ({
@@ -31,59 +61,31 @@ vi.mock('recharts', () => ({
   Legend: () => null,
 }))
 
-const mockStats: DashboardStats = {
-  totalResources: 4,
-  equipmentInUse: 1,
-  vehiclesInUse: 1,
-  securityDevicesActive: 0,
-  available: 2,
-  inMaintenance: 1,
-  recentLogs: [
-    { id: 1, access_area: 'Sala de Controle', access_time: '2026-07-26T10:00:00Z', status: 'sucesso' },
-  ],
-  allLogs: [
-    { id: 1, access_area: 'Sala de Controle', access_time: '2026-07-26T10:00:00Z', status: 'sucesso' },
-  ],
-  overdueMaintenance: [],
-  maintenanceResources: [
-    { id: 1, name: 'Drone', type: 'dispositivo_seguranca', status: 'em_manutencao', last_maintenance_date: '2026-06-01', serial_number: null, plate: null, location: 'Hangar', acquisition_date: '2025-01-01' },
-  ],
-  resourcesByType: [
-    { name: 'equipamento', value: 2 },
-    { name: 'veiculo', value: 1 },
-    { name: 'dispositivo_seguranca', value: 1 },
-  ],
-  resourcesByStatus: [
-    { name: 'disponivel', value: 2 },
-    { name: 'em_uso', value: 1 },
-    { name: 'em_manutencao', value: 1 },
-  ],
-  logsByDay: [
-    { day: '20/07/2026', sucesso: 3, falha: 0 },
-    { day: '21/07/2026', sucesso: 1, falha: 1 },
-  ],
-}
-
 describe('DashboardClient', () => {
-  it('renders welcome message with user name', () => {
-    render(<DashboardClient profile={{ role: 'admin_seguranca', nome: 'Bruce' }} stats={mockStats} userRole="admin_seguranca" />)
-    expect(screen.getByText(/Bruce/)).toBeTruthy()
+  it('renders welcome message with user name', async () => {
+    render(<DashboardClient profile={{ role: 'admin_seguranca', nome: 'Bruce' }} userRole="admin_seguranca" />)
+    await waitFor(() => expect(screen.getByText(/Bruce/)).toBeTruthy())
   })
 
-  it('renders stat cards', () => {
-    render(<DashboardClient profile={{ role: 'admin_seguranca', nome: 'Bruce' }} stats={mockStats} userRole="admin_seguranca" />)
-    expect(screen.getByText('Equipamentos em Uso')).toBeTruthy()
-    expect(screen.getByText('Veículos em Operação')).toBeTruthy()
+  it('renders stat cards', async () => {
+    render(<DashboardClient profile={{ role: 'admin_seguranca', nome: 'Bruce' }} userRole="admin_seguranca" />)
+    await waitFor(() => {
+      expect(screen.getByText('Equipamentos em Uso')).toBeTruthy()
+      expect(screen.getByText('Veículos em Operação')).toBeTruthy()
+    })
   })
 
-  it('renders recent logs section', () => {
-    render(<DashboardClient profile={{ role: 'funcionario', nome: 'Test' }} stats={mockStats} userRole="funcionario" />)
-    expect(screen.getByText('Sala de Controle')).toBeTruthy()
+  it('renders recent logs section', async () => {
+    render(<DashboardClient profile={{ role: 'funcionario', nome: 'Test' }} userRole="funcionario" />)
+    await waitFor(() => expect(screen.getByText('Sala de Controle')).toBeTruthy())
   })
 
-  it('shows empty state when no logs', () => {
-    const emptyStats = { ...mockStats, recentLogs: [], allLogs: [] }
-    render(<DashboardClient profile={{ role: 'funcionario', nome: 'Test' }} stats={emptyStats} userRole="funcionario" />)
-    expect(screen.getByText('Nenhuma atividade registrada ainda.')).toBeTruthy()
+  it('shows empty state when no logs', async () => {
+    mockState.logData = []
+    render(<DashboardClient profile={{ role: 'funcionario', nome: 'Test' }} userRole="funcionario" />)
+    await waitFor(() => expect(screen.getByText('Nenhuma atividade registrada ainda.')).toBeTruthy())
+    mockState.logData = [
+      { id: 1, access_area: 'Sala de Controle', access_time: '2026-07-26T10:00:00Z', status: 'sucesso', user_id: null, ip_address: null },
+    ]
   })
 })

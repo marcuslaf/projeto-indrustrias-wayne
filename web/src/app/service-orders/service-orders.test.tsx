@@ -1,11 +1,15 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { ServiceOrdersClient } from './service-orders-client'
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
   usePathname: () => '/service-orders',
   useParams: () => ({}),
+}))
+
+const mockState = vi.hoisted(() => ({
+  ordersData: [] as any[],
 }))
 
 vi.mock('@/lib/supabase-client', () => ({
@@ -15,18 +19,33 @@ vi.mock('@/lib/supabase-client', () => ({
         data: { user: { id: '123', user_metadata: { role: 'admin_seguranca' } } },
       }),
     },
-    from: vi.fn().mockReturnValue({
-      select: vi.fn().mockReturnValue({
-        eq: vi.fn().mockReturnValue({
-          single: vi.fn().mockResolvedValue({ data: null, error: null }),
-          order: vi.fn().mockResolvedValue({ data: [], error: null }),
-        }),
-        order: vi.fn().mockResolvedValue({ data: [], error: null }),
-      }),
-      insert: vi.fn().mockResolvedValue({ error: null, data: null }),
-      update: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
-      delete: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
+    from: vi.fn().mockImplementation((table: string) => {
+      if (table === 'resources') {
+        const chain: any = {
+          select: vi.fn().mockReturnThis(),
+          is: vi.fn().mockReturnThis(),
+          order: vi.fn().mockResolvedValue({ data: [{ id: 1, name: 'Gerador' }], error: null }),
+        }
+        return chain
+      }
+      if (table === 'profiles') {
+        const chain: any = {
+          select: vi.fn().mockReturnThis(),
+          order: vi.fn().mockResolvedValue({ data: [{ id: 'user1', username: 'bruce', nome: 'Bruce Wayne' }], error: null }),
+        }
+        return chain
+      }
+      const chain: any = {
+        select: vi.fn().mockReturnThis(),
+        order: vi.fn().mockImplementation(() =>
+          Promise.resolve({ data: mockState.ordersData, error: null }),
+        ),
+      }
+      return chain
     }),
+    insert: vi.fn().mockResolvedValue({ error: null, data: null }),
+    update: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
+    delete: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }),
     channel: vi.fn().mockReturnValue({ on: vi.fn().mockReturnValue({ subscribe: vi.fn() }) }),
     removeChannel: vi.fn(),
   }),
@@ -71,21 +90,21 @@ const mockProfiles = [{ id: 'user1', username: 'bruce', nome: 'Bruce Wayne' }]
 describe('ServiceOrdersClient', () => {
   it('renders the title "Ordens de Serviço"', () => {
     render(
-      <ServiceOrdersClient orders={[]} resources={mockResources} profiles={mockProfiles} userRole="admin_seguranca" />
+      <ServiceOrdersClient orders={mockOrders} resources={mockResources} profiles={mockProfiles} userRole="admin_seguranca" />
     )
     expect(screen.getByText('Ordens de Serviço')).toBeTruthy()
   })
 
   it('shows "Nova Ordem" button for admin/gerente roles', () => {
     render(
-      <ServiceOrdersClient orders={[]} resources={mockResources} profiles={mockProfiles} userRole="admin_seguranca" />
+      <ServiceOrdersClient orders={mockOrders} resources={mockResources} profiles={mockProfiles} userRole="admin_seguranca" />
     )
     expect(screen.getByText('Nova Ordem')).toBeTruthy()
   })
 
   it('hides "Nova Ordem" button for funcionario role', () => {
     render(
-      <ServiceOrdersClient orders={[]} resources={mockResources} profiles={mockProfiles} userRole="funcionario" />
+      <ServiceOrdersClient orders={mockOrders} resources={mockResources} profiles={mockProfiles} userRole="funcionario" />
     )
     expect(screen.queryByText('Nova Ordem')).toBeNull()
   })
@@ -97,10 +116,10 @@ describe('ServiceOrdersClient', () => {
     expect(screen.getByText('Reparo no gerador')).toBeTruthy()
   })
 
-  it('shows empty state when no orders', () => {
+  it('shows empty state when no orders', async () => {
     render(
       <ServiceOrdersClient orders={[]} resources={mockResources} profiles={mockProfiles} userRole="admin_seguranca" />
     )
-    expect(screen.getByText('Nenhuma ordem encontrada.')).toBeTruthy()
+    await waitFor(() => expect(screen.getByText('Nenhuma ordem encontrada.')).toBeTruthy())
   })
 })
