@@ -89,6 +89,7 @@ export function DashboardClient({ profile, userRole }: DashboardClientProps) {
   const [period, setPeriod] = useState('7')
   const [resourceFilter, setResourceFilter] = useState('all')
   const [chartTip, setChartTip] = useState<{ payload: { name: string; value: number; color: string; dataKey: string }[]; label: string; x: number; y: number } | null>(null)
+  const [chartTipAccess, setChartTipAccess] = useState<{ payload: { name: string; value: number; color: string; dataKey: string }[]; label: string; x: number; y: number } | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
@@ -556,9 +557,22 @@ export function DashboardClient({ profile, userRole }: DashboardClientProps) {
                     <CardTitle className="text-lg text-zinc-100">Acessos por Dia</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="h-72">
+                    <div className="h-72 relative">
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={logsByDay}>
+                        <BarChart
+                          data={logsByDay}
+                          onMouseMove={(state: any) => {
+                            if (state.isTooltipActive && state.activePayload?.length) {
+                              setChartTipAccess({
+                                payload: state.activePayload.map((p: any) => ({ name: p.name, value: p.value, color: p.color ?? (p.dataKey === 'sucesso' ? '#22c55e' : '#ef4444'), dataKey: p.dataKey })),
+                                label: state.activeLabel ?? '',
+                                x: state.activeCoordinate?.x ?? 0,
+                                y: state.activeCoordinate?.y ?? 0,
+                              })
+                            }
+                          }}
+                          onMouseLeave={() => setChartTipAccess(null)}
+                        >
                           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                           <XAxis
                             dataKey="day"
@@ -570,13 +584,39 @@ export function DashboardClient({ profile, userRole }: DashboardClientProps) {
                             axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
                             allowDecimals={false}
                           />
-                          <Tooltip content={<CustomTooltip />} wrapperStyle={{ background: 'transparent', backgroundColor: 'transparent', border: 'none', boxShadow: 'none', outline: 'none' }} />
                           <Legend
                             formatter={(value: string) => <span className="text-zinc-400 text-sm">{value === 'sucesso' ? 'Sucesso' : 'Falha'}</span>}
                           />
                           <Bar dataKey="sucesso" name="sucesso" fill="#22c55e" radius={[4, 4, 0, 0]} stackId="a" />
                           <Bar dataKey="falha" name="falha" fill="#ef4444" radius={[4, 4, 0, 0]} stackId="a" />
                         </BarChart>
+                        {chartTipAccess && (
+                          <div
+                            style={{
+                              position: 'absolute',
+                              left: chartTipAccess.x,
+                              top: chartTipAccess.y - 10,
+                              transform: 'translate(-50%, -100%)',
+                              backgroundColor: '#18181b',
+                              border: '1px solid #3f3f46',
+                              borderRadius: '0.5rem',
+                              padding: '0.5rem 0.75rem',
+                              boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)',
+                              zIndex: 50,
+                              pointerEvents: 'none',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            <p style={{ fontWeight: 500, marginBottom: '0.25rem', color: '#d4d4d8' }}>
+                              {chartTipAccess.label}
+                            </p>
+                            {chartTipAccess.payload.map((entry, i) => (
+                              <p key={i} style={{ fontWeight: 600, color: entry.color }}>
+                                {entry.name === 'sucesso' ? 'Sucesso' : 'Falha'}: {entry.value}
+                              </p>
+                            ))}
+                          </div>
+                        )}
                       </ResponsiveContainer>
                     </div>
                   </CardContent>
