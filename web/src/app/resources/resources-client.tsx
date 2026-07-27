@@ -162,8 +162,8 @@ export function ResourcesClient({ resources: initialResources, userRole, default
     const payload = parsed.data
 
     if (editingId) {
-      const { error } = await (supabase
-        .from('resources') as any)
+      const { error } = await supabase
+        .from('resources')
         .update(payload)
         .eq('id', editingId)
 
@@ -176,8 +176,8 @@ export function ResourcesClient({ resources: initialResources, userRole, default
       logAccess(`Recursos: Editar - ${form.name}`)
     } else {
       const { data: { user } } = await supabase.auth.getUser()
-      const { error } = await (supabase
-        .from('resources') as any)
+      const { error } = await supabase
+        .from('resources')
         .insert({ ...payload, created_by: user?.id ?? null })
 
       if (error) {
@@ -190,7 +190,7 @@ export function ResourcesClient({ resources: initialResources, userRole, default
     }
 
     resetForm()
-    const { data } = await (supabase.from('resources') as any).select('*').is('deleted_at', null).order('created_at', { ascending: false })
+    const { data } = await supabase.from('resources').select('*').is('deleted_at', null).order('created_at', { ascending: false })
     if (data) setResources(data as Resource[])
     setLoading(false)
   }
@@ -219,8 +219,8 @@ export function ResourcesClient({ resources: initialResources, userRole, default
     })
     if (!confirmed) return
     const resource = resources.find(r => r.id === id)
-    const { error } = await (supabase
-      .from('resources') as any)
+    const { error } = await supabase
+      .from('resources')
       .update({ deleted_at: new Date().toISOString() })
       .eq('id', id)
 
@@ -235,23 +235,6 @@ export function ResourcesClient({ resources: initialResources, userRole, default
 
   return (
     <div className="relative min-h-screen bg-zinc-950">
-      <div className="absolute inset-0 bg-[url('/gotham-bg.jpg')] bg-cover bg-center opacity-[0.12] pointer-events-none" />
-      <div
-        className="absolute inset-0 opacity-[0.03] pointer-events-none"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(168,85,247,1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(168,85,247,1) 1px, transparent 1px)
-          `,
-          backgroundSize: '48px 48px',
-        }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-purple-950/15 via-transparent to-transparent pointer-events-none" />
-      <div className="absolute top-8 left-1/2 -translate-x-1/2 text-center opacity-[0.03] pointer-events-none select-none">
-        <svg viewBox="0 0 1000 120" className="w-[800px] h-[110px]" fill="currentColor" color="white">
-          <text x="500" y="80" textAnchor="middle" fontSize="56" fontWeight="900" fontFamily="sans-serif" letterSpacing="14">INDÚSTRIAS WAYNE</text>
-        </svg>
-      </div>
       <Navbar userRole={userRole} />
       <main className="relative mx-auto max-w-7xl px-4 py-8 pt-20">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-8 gap-2">

@@ -28,6 +28,7 @@ export type Database = {
           status?: 'sucesso' | 'falha'
           user_id?: string | null
         }
+        Relationships: []
       }
       audit_logs: {
         Row: {
@@ -66,6 +67,7 @@ export type Database = {
           ip_address?: string | null
           created_at?: string
         }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -95,6 +97,7 @@ export type Database = {
           updated_at?: string
           username?: string
         }
+        Relationships: []
       }
       resources: {
         Row: {
@@ -142,12 +145,86 @@ export type Database = {
           type?: 'equipamento' | 'veiculo' | 'dispositivo_seguranca'
           updated_at?: string
         }
+        Relationships: []
+      }
+      service_orders: {
+        Row: {
+          id: number
+          title: string
+          description: string | null
+          resource_id: number | null
+          assigned_to: string | null
+          priority: 'baixa' | 'media' | 'alta' | 'urgente'
+          status: 'aberta' | 'em_andamento' | 'concluida' | 'cancelada'
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          title: string
+          description?: string | null
+          resource_id?: number | null
+          assigned_to?: string | null
+          priority?: 'baixa' | 'media' | 'alta' | 'urgente'
+          status?: 'aberta' | 'em_andamento' | 'concluida' | 'cancelada'
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+        Update: {
+          id?: number
+          title?: string
+          description?: string | null
+          resource_id?: number | null
+          assigned_to?: string | null
+          priority?: 'baixa' | 'media' | 'alta' | 'urgente'
+          status?: 'aberta' | 'em_andamento' | 'concluida' | 'cancelada'
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+        Relationships: []
+      }
+      maintenance_history: {
+        Row: {
+          id: number
+          resource_id: number
+          description: string
+          performed_by: string | null
+          maintenance_date: string
+          cost: number | null
+          created_at: string
+        }
+        Insert: {
+          id?: number
+          resource_id: number
+          description: string
+          performed_by?: string | null
+          maintenance_date?: string
+          cost?: number | null
+          created_at?: string
+        }
+        Update: {
+          id?: number
+          resource_id?: number
+          description?: string
+          performed_by?: string | null
+          maintenance_date?: string
+          cost?: number | null
+          created_at?: string
+        }
+        Relationships: []
       }
     }
     Views: Record<string, never>
     Functions: {
       admin_delete_user: {
         Args: { user_id: string }
+        Returns: undefined
+      }
+      delete_old_logs: {
+        Args: { days: number }
         Returns: undefined
       }
     }

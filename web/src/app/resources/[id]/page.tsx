@@ -110,9 +110,9 @@ export default function ResourceDetailPage() {
       if (!user) { router.push('/login'); return }
       setUserRole(user.user_metadata?.role ?? 'funcionario')
 
-    const { data } = await (supabase.from('resources') as any).select('*').eq('id', id).is('deleted_at', null).single()
+    const { data } = await supabase.from('resources').select('*').eq('id', id).is('deleted_at', null).single()
     if (!data) { router.push('/resources'); return }
-    const r = data as any
+    const r = data
       setResource(r)
       setForm({
         name: r.name, type: r.type, serial_number: r.serial_number ?? '',
@@ -126,11 +126,11 @@ export default function ResourceDetailPage() {
 
   useEffect(() => {
     if (!id) return
-    ;(supabase.from('maintenance_history') as any)
+    supabase.from('maintenance_history')
       .select('*')
       .eq('resource_id', id)
       .order('maintenance_date', { ascending: false })
-      .then(({ data }: any) => {
+      .then(({ data }) => {
         if (data) setMaintenance(data)
       })
   }, [id])
@@ -139,7 +139,7 @@ export default function ResourceDetailPage() {
     e.preventDefault()
     if (!maintenanceForm.description) { toast.error('Descrição é obrigatória'); return }
     setSavingMaintenance(true)
-    const { error } = await (supabase.from('maintenance_history') as any).insert({
+    const { error } = await supabase.from('maintenance_history').insert({
       resource_id: id,
       description: maintenanceForm.description,
       performed_by: maintenanceForm.performed_by || null,
@@ -152,7 +152,7 @@ export default function ResourceDetailPage() {
     setMaintenanceForm({ description: '', performed_by: '', maintenance_date: '', cost: '' })
     setShowMaintenanceForm(false)
     setSavingMaintenance(false)
-    const { data } = await (supabase.from('maintenance_history') as any)
+    const { data } = await supabase.from('maintenance_history')
       .select('*').eq('resource_id', id).order('maintenance_date', { ascending: false })
     if (data) setMaintenance(data)
   }
@@ -166,7 +166,7 @@ export default function ResourceDetailPage() {
       variant: 'destructive',
     })
     if (!confirmed) return
-    const { error } = await (supabase.from('maintenance_history') as any).delete().eq('id', mtceId)
+    const { error } = await supabase.from('maintenance_history').delete().eq('id', mtceId)
     if (error) { toast.error(error.message); return }
     toast.success('Registro excluído!')
     setMaintenance((prev: any[]) => prev.filter((m: any) => m.id !== mtceId))
@@ -176,11 +176,16 @@ export default function ResourceDetailPage() {
     e.preventDefault()
     setSaving(true)
     const payload = {
-      name: form.name, type: form.type, serial_number: form.serial_number || null,
-      plate: form.plate || null, location: form.location, status: form.status,
-      acquisition_date: form.acquisition_date, last_maintenance_date: form.last_maintenance_date || null,
+      name: form.name,
+      type: form.type as 'equipamento' | 'veiculo' | 'dispositivo_seguranca',
+      serial_number: form.serial_number || null,
+      plate: form.plate || null,
+      location: form.location,
+      status: form.status as 'disponivel' | 'em_uso' | 'em_manutencao',
+      acquisition_date: form.acquisition_date,
+      last_maintenance_date: form.last_maintenance_date || null,
     }
-    const { error } = await (supabase.from('resources') as any).update(payload).eq('id', id)
+    const { error } = await supabase.from('resources').update(payload).eq('id', id)
     if (error) { toast.error(error.message); setSaving(false); return }
     toast.success('Recurso atualizado!')
     logAccess(`Recursos: Editar - ${form.name}`)
@@ -201,12 +206,6 @@ export default function ResourceDetailPage() {
 
   return (
     <div className="relative min-h-screen bg-zinc-950">
-      <div className="absolute inset-0 bg-[url('/gotham-bg.jpg')] bg-cover bg-center opacity-[0.12] pointer-events-none" />
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{
-        backgroundImage: `linear-gradient(rgba(168,85,247,1) 1px, transparent 1px), linear-gradient(90deg, rgba(168,85,247,1) 1px, transparent 1px)`,
-        backgroundSize: '48px 48px',
-      }} />
-      <div className="absolute inset-0 bg-gradient-to-b from-purple-950/15 via-transparent to-transparent pointer-events-none" />
       <Navbar userRole={userRole} />
       <main className="relative mx-auto max-w-3xl px-4 py-8 pt-20">
         <Button variant="ghost" onClick={() => router.push('/resources')} className="mb-6 text-zinc-400 hover:text-zinc-100 -ml-2">

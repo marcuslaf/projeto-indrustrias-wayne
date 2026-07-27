@@ -90,12 +90,12 @@ export function ServiceOrdersClient({ orders: initialOrders, resources, profiles
     e.preventDefault()
     if (!form.title) { toast.error('Título é obrigatório'); return }
     setSaving(true)
-    const { error } = await (supabase.from('service_orders') as any).insert({
+    const { error } = await supabase.from('service_orders').insert({
       title: form.title,
       description: form.description || null,
       resource_id: form.resource_id ? Number(form.resource_id) : null,
       assigned_to: form.assigned_to || null,
-      priority: form.priority,
+      priority: form.priority as 'baixa' | 'media' | 'alta' | 'urgente',
     })
     if (error) { toast.error(error.message); setSaving(false); return }
     toast.success('Ordem de serviço criada!')
@@ -107,7 +107,7 @@ export function ServiceOrdersClient({ orders: initialOrders, resources, profiles
   }
 
   async function updateStatus(id: number, status: string) {
-    const { error } = await (supabase.from('service_orders') as any).update({ status, updated_at: new Date().toISOString() }).eq('id', id)
+    const { error } = await supabase.from('service_orders').update({ status: status as 'aberta' | 'em_andamento' | 'concluida' | 'cancelada', updated_at: new Date().toISOString() }).eq('id', id)
     if (error) { toast.error(error.message); return }
     toast.success(`Status atualizado para ${statusLabel[status]}`)
     refresh()
@@ -121,7 +121,7 @@ export function ServiceOrdersClient({ orders: initialOrders, resources, profiles
       variant: 'destructive',
     })
     if (!confirmed) return
-    const { error } = await (supabase.from('service_orders') as any).delete().eq('id', id)
+    const { error } = await supabase.from('service_orders').delete().eq('id', id)
     if (error) { toast.error(error.message); return }
     toast.success('Ordem excluída!')
     setOrders((prev) => prev.filter((o) => o.id !== id))
@@ -137,12 +137,6 @@ export function ServiceOrdersClient({ orders: initialOrders, resources, profiles
 
   return (
     <div className="relative min-h-screen bg-zinc-950">
-      <div className="absolute inset-0 bg-[url('/gotham-bg.jpg')] bg-cover bg-center opacity-[0.12] pointer-events-none" />
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{
-        backgroundImage: `linear-gradient(rgba(168,85,247,1) 1px, transparent 1px), linear-gradient(90deg, rgba(168,85,247,1) 1px, transparent 1px)`,
-        backgroundSize: '48px 48px',
-      }} />
-      <div className="absolute inset-0 bg-gradient-to-b from-purple-950/15 via-transparent to-transparent pointer-events-none" />
       <Navbar userRole={userRole} />
       <main className="relative mx-auto max-w-5xl px-4 py-8 pt-20">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-8 gap-2">

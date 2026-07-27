@@ -44,6 +44,7 @@ const mockStats: DashboardStats = {
   allLogs: [
     { id: 1, access_area: 'Sala de Controle', access_time: '2026-07-26T10:00:00Z', status: 'sucesso' },
   ],
+  overdueMaintenance: [],
   maintenanceResources: [
     { id: 1, name: 'Drone', type: 'dispositivo_seguranca', status: 'em_manutencao', last_maintenance_date: '2026-06-01', serial_number: null, plate: null, location: 'Hangar', acquisition_date: '2025-01-01' },
   ],

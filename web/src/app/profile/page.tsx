@@ -40,7 +40,7 @@ export default function ProfilePage() {
       const { data: p } = await supabase.from('profiles').select('*').eq('id', u.id).single()
       if (p) {
         setProfile(p)
-        setNome((p as any).nome ?? '')
+        setNome(p.nome ?? '')
       }
     }
     load()
@@ -50,7 +50,7 @@ export default function ProfilePage() {
     e.preventDefault()
     if (!nome.trim()) { toast.error('Nome não pode ficar vazio.'); return }
     setLoading(true)
-    const { error } = await (supabase.from('profiles') as any).update({ nome: nome.trim() }).eq('id', user.id)
+    const { error } = await supabase.from('profiles').update({ nome: nome.trim() }).eq('id', user.id)
     if (error) { toast.error(error.message); setLoading(false); return }
     toast.success('Perfil atualizado com sucesso!')
     logAccess('Perfil: Editar nome')
@@ -84,12 +84,6 @@ export default function ProfilePage() {
 
   return (
     <div className="relative min-h-screen bg-zinc-950">
-      <div className="absolute inset-0 bg-[url('/gotham-bg.jpg')] bg-cover bg-center opacity-[0.12] pointer-events-none" />
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{
-        backgroundImage: `linear-gradient(rgba(168,85,247,1) 1px, transparent 1px), linear-gradient(90deg, rgba(168,85,247,1) 1px, transparent 1px)`,
-        backgroundSize: '48px 48px',
-      }} />
-      <div className="absolute inset-0 bg-gradient-to-b from-purple-950/15 via-transparent to-transparent pointer-events-none" />
       <Navbar userRole={userRole} />
       <main className="relative mx-auto max-w-3xl px-4 py-8 pt-20">
         <div className="mb-8">

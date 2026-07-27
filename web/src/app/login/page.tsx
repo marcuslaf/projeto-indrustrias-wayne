@@ -64,17 +64,6 @@ export default function LoginPage() {
 
   return (
     <div className="relative min-h-screen bg-zinc-950 flex items-center justify-center p-4 overflow-hidden">
-      <div className="absolute inset-0 bg-[url('/gotham-bg.jpg')] bg-cover bg-center opacity-[0.12] pointer-events-none" />
-      <div
-        className="absolute inset-0 opacity-[0.04]"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(168,85,247,1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(168,85,247,1) 1px, transparent 1px)
-          `,
-          backgroundSize: '48px 48px',
-        }}
-      />
       <div
         className="absolute inset-0 opacity-[0.03]"
         style={{
@@ -101,11 +90,6 @@ export default function LoginPage() {
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full bg-purple-600/5 blur-3xl" />
       <div className="absolute top-1/3 left-1/4 w-[300px] h-[300px] rounded-full bg-indigo-600/3 blur-3xl" />
       <div className="absolute top-1/3 right-1/4 w-[300px] h-[300px] rounded-full bg-purple-500/3 blur-3xl" />
-      <div className="absolute top-8 left-1/2 -translate-x-1/2 text-center opacity-[0.03] pointer-events-none select-none">
-        <svg viewBox="0 0 1000 120" className="w-[800px] h-[110px]" fill="currentColor" color="white">
-          <text x="500" y="80" textAnchor="middle" fontSize="56" fontWeight="900" fontFamily="sans-serif" letterSpacing="14">INDÚSTRIAS WAYNE</text>
-        </svg>
-      </div>
       <div
         className="absolute top-0 left-0 right-0 h-px"
         style={{

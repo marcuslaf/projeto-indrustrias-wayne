@@ -15,7 +15,12 @@ export async function GET() {
       return NextResponse.json({ error: 'Apenas admin_seguranca pode executar seed' }, { status: 403 })
     }
 
-    const seeds = [
+    const seeds: {
+      name: string; type: 'equipamento' | 'veiculo' | 'dispositivo_seguranca'
+      serial_number?: string; plate?: string; location: string
+      status: 'disponivel' | 'em_uso' | 'em_manutencao'
+      acquisition_date: string; last_maintenance_date?: string
+    }[] = [
       { name: 'Servidor Principal Arkham', type: 'equipamento', serial_number: 'SRV-ARK-001', location: 'Sala de Servidores - Arkham', status: 'em_uso', acquisition_date: '2025-01-15', last_maintenance_date: '2026-06-01' },
       { name: 'Van de Transporte Tático', type: 'veiculo', plate: 'VTT-2026', location: 'Garagem Principal', status: 'disponivel', acquisition_date: '2026-03-10' },
       { name: 'Scanner Biométrico Portátil', type: 'dispositivo_seguranca', serial_number: 'BIO-SCAN-042', location: 'Ala de Segurança', status: 'em_manutencao', acquisition_date: '2024-11-20', last_maintenance_date: '2026-05-15' },
@@ -26,10 +31,10 @@ export async function GET() {
     for (const seed of seeds) {
       const { error } = await supabase
         .from('resources')
-        .insert({ ...seed, created_by: user.id } as any)
+        .insert({ ...seed, created_by: user.id })
 
       if (!error) {
-        await (supabase.from('access_logs') as any).insert({
+        await supabase.from('access_logs').insert({
           access_area: `Recursos: Seed - ${seed.name}`,
           access_time: new Date().toISOString(),
           status: 'sucesso',
