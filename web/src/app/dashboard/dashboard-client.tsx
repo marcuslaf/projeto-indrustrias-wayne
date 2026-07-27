@@ -18,6 +18,7 @@ import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer,
 } from 'recharts'
+
 import {
   Package, Wrench, ShieldCheck, Truck, AlertTriangle, Activity,
   RefreshCw, ExternalLink,
@@ -437,7 +438,7 @@ export function DashboardClient({ profile, stats, userRole }: DashboardClientPro
                           axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
                           allowDecimals={false}
                         />
-                        <Tooltip content={<CustomTooltip />} wrapperStyle={{ background: 'transparent', backgroundColor: 'transparent', border: 'none', boxShadow: 'none', outline: 'none' }} />
+                        <Tooltip content={<CustomTooltip />} wrapperStyle={{ background: 'transparent', backgroundColor: 'transparent', border: 'none', boxShadow: 'none', outline: 'none' }} isAnimationActive={false} />
                         <Bar dataKey="value" name="Recursos" radius={[4, 4, 0, 0]}>
                           {stats.resourcesByStatus.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={statusColor[entry.name] ?? CHART_COLORS[index % CHART_COLORS.length]} />
