@@ -562,13 +562,19 @@ export function DashboardClient({ profile, userRole }: DashboardClientProps) {
                         <BarChart
                           data={logsByDay}
                           onMouseMove={(state: any) => {
-                            if (state.isTooltipActive && state.activePayload?.length) {
-                              setChartTipAccess({
-                                payload: state.activePayload.map((p: any) => ({ name: p.name, value: p.value, color: p.color ?? (p.dataKey === 'sucesso' ? '#22c55e' : '#ef4444'), dataKey: p.dataKey })),
-                                label: state.activeLabel ?? '',
-                                x: state.activeCoordinate?.x ?? 0,
-                                y: state.activeCoordinate?.y ?? 0,
-                              })
+                            if (state.isTooltipActive && state.activeIndex != null) {
+                              const dayData = logsByDay[state.activeIndex]
+                              if (dayData) {
+                                setChartTipAccess({
+                                  payload: [
+                                    { name: 'sucesso', value: dayData.sucesso, color: '#22c55e', dataKey: 'sucesso' },
+                                    { name: 'falha', value: dayData.falha, color: '#ef4444', dataKey: 'falha' },
+                                  ],
+                                  label: dayData.day,
+                                  x: state.activeCoordinate?.x ?? 0,
+                                  y: state.activeCoordinate?.y ?? 0,
+                                })
+                              }
                             }
                           }}
                           onMouseLeave={() => setChartTipAccess(null)}
