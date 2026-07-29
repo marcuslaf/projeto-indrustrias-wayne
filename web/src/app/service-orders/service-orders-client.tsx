@@ -80,7 +80,7 @@ export function ServiceOrdersClient({ orders: initialOrders, resources: initialR
   useEffect(() => {
     async function loadData() {
       const [ordersRes, resourcesRes, profilesRes] = await Promise.all([
-        (supabase as any)
+        supabase
           .from('service_orders')
           .select('*, resource:resources(id, name), assignee:profiles!assigned_to(id, username, nome)')
           .order('created_at', { ascending: false }),
@@ -112,12 +112,14 @@ export function ServiceOrdersClient({ orders: initialOrders, resources: initialR
     e.preventDefault()
     if (!form.title) { toast.error('Título é obrigatório'); return }
     setSaving(true)
+    const { data: { user } } = await supabase.auth.getUser()
     const { error } = await supabase.from('service_orders').insert({
       title: form.title,
       description: form.description || null,
       resource_id: form.resource_id ? Number(form.resource_id) : null,
       assigned_to: form.assigned_to || null,
       priority: form.priority as 'baixa' | 'media' | 'alta' | 'urgente',
+      created_by: user?.id ?? null,
     })
     if (error) { toast.error(error.message); setSaving(false); return }
     toast.success('Ordem de serviço criada!')
@@ -150,8 +152,8 @@ export function ServiceOrdersClient({ orders: initialOrders, resources: initialR
   }
 
   async function refresh() {
-    const { data } = await (supabase
-      .from('service_orders') as any)
+    const { data } = await supabase
+      .from('service_orders')
       .select('*, resource:resources(id, name), assignee:profiles!assigned_to(id, username, nome)')
       .order('created_at', { ascending: false })
     if (data) setOrders(data)

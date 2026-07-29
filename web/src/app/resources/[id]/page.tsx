@@ -108,11 +108,17 @@ export default function ResourceDetailPage() {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
-      setUserRole(user.user_metadata?.role ?? 'funcionario')
 
-    const { data } = await supabase.from('resources').select('*').eq('id', id).is('deleted_at', null).single()
-    if (!data) { router.push('/resources'); return }
-    const r = data
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+      setUserRole(profile?.role ?? user?.user_metadata?.role ?? 'funcionario')
+
+      const { data } = await supabase.from('resources').select('*').eq('id', id).is('deleted_at', null).single()
+      if (!data) { router.push('/resources'); return }
+      const r = data
       setResource(r)
       setForm({
         name: r.name, type: r.type, serial_number: r.serial_number ?? '',
@@ -142,7 +148,7 @@ export default function ResourceDetailPage() {
     const { error } = await supabase.from('maintenance_history').insert({
       resource_id: id,
       description: maintenanceForm.description,
-      performed_by: maintenanceForm.performed_by || null,
+      performed_by: maintenanceForm.performed_by || '',
       maintenance_date: maintenanceForm.maintenance_date || new Date().toISOString().split('T')[0],
       cost: maintenanceForm.cost ? Number(maintenanceForm.cost) : null,
     })

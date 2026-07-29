@@ -80,7 +80,7 @@ export default function ProfilePage() {
     setChangingPassword(false)
   }
 
-  const userRole = user?.user_metadata?.role ?? 'funcionario'
+  const userRole = profile?.role ?? user?.user_metadata?.role ?? 'funcionario'
 
   return (
     <div className="relative min-h-screen bg-zinc-950">

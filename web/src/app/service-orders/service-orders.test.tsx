@@ -9,7 +9,7 @@ vi.mock('next/navigation', () => ({
 }))
 
 const mockState = vi.hoisted(() => ({
-  ordersData: [] as any[],
+  ordersData: [] as unknown[] as { id: number; title: string; description: string | null; resource_id: number | null; assigned_to: string | null; priority: string; status: string; created_by: string | null; created_at: string; updated_at: string; resource: { id: number; name: string } | null; assignee: { id: string; username: string; nome: string } | null }[],
 }))
 
 vi.mock('@/lib/supabase-client', () => ({

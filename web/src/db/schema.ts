@@ -1,39 +1,10 @@
-export type UserRole = 'funcionario' | 'gerente' | 'admin_seguranca'
-export type ResourceType = 'equipamento' | 'veiculo' | 'dispositivo_seguranca'
-export type ResourceStatus = 'disponivel' | 'em_uso' | 'em_manutencao'
-export type AccessStatus = 'sucesso' | 'falha'
+import type { Database } from '@/lib/supabase-client'
 
-export interface Profile {
-  id: string
-  username: string
-  role: UserRole
-  nome: string
-  email: string | null
-  created_at: string
-  updated_at: string
-}
+export type UserRole = Database['public']['Enums']['user_role']
+export type ResourceType = Database['public']['Enums']['resource_type']
+export type ResourceStatus = Database['public']['Enums']['resource_status']
+export type AccessStatus = Database['public']['Enums']['access_status']
 
-export interface Resource {
-  id: number
-  name: string
-  type: ResourceType
-  serial_number: string | null
-  plate: string | null
-  location: string
-  status: ResourceStatus
-  acquisition_date: string
-  last_maintenance_date: string | null
-  created_by: string | null
-  created_at: string
-  updated_at: string
-  deleted_at: string | null
-}
-
-export interface AccessLog {
-  id: number
-  user_id: string | null
-  access_area: string
-  access_time: string
-  status: AccessStatus
-  ip_address: string | null
-}
+export type Profile = Database['public']['Tables']['profiles']['Row']
+export type Resource = Database['public']['Tables']['resources']['Row']
+export type AccessLog = Database['public']['Tables']['access_logs']['Row']
